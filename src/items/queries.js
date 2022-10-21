@@ -1,5 +1,5 @@
 const getItems = "SELECT * FROM items";
-const getItemsByName = "SELECT * FROM customers WHERE name = $1"
+const getItemsByName = "SELECT * FROM items WHERE name = $1"
 const checkNameExists = "SELECT s FROM customers s WHERE s.name = $1";
 const addStudent = "INSERT INTO customers (name, email, phone, mobile, address) VALUES ($1,$2, $3, $4, $5)"
 const checkIdExists =  "SELECT s FROM customers s WHERE s.id = $1";

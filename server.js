@@ -5,7 +5,7 @@ const itemsRoutes = require('./src/items/routes')
 const employees = require('./src/employees/routes')
 const cors = require('cors')
 const app = express(express);
-const port = 3001;
+const port = 9090;
 
 app.use(express.json())
 app.use(cors())

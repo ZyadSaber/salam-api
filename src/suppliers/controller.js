@@ -40,7 +40,7 @@ const postSuppliers = (req, res) =>{
              res.send(error.detail)
              return;
         };
-        res.status(201).send("{success: success}")
+        res.status(201).send({success: "success"})
     })
     })
     }else{
@@ -60,7 +60,7 @@ const postSuppliers = (req, res) =>{
             res.send(error.detail)
             return;
         };
-        res.status(200).send("{success: success}")
+        res.status(200).send({success: "success"})
         })
     })
     }else if (query_status === "u") {
@@ -69,7 +69,7 @@ const postSuppliers = (req, res) =>{
              res.send(error.detail)
              return;
         };
-        res.status(201).send("{success: success}")
+        res.status(201).send({success: "success"})
     })
     }else{
         res.send(`query_status is ${query_status}`)

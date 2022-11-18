@@ -28,10 +28,10 @@ const postCustomers = (req, res) =>{
     const {name, email, phone, mobile, address, query_status, customer_id} = req.body;
     if (query_status === "n") {
         //add Customer
-        if (name !== undefined) {
+        if (name !== undefined && name.length!==0) {
     pool.query(queries.checkNameExists, [name], (error, results)=>{
         if (results.rows.length){
-            res.send("name already exist")
+            res.send({response:"name already exist"})
             return
         }
     //postCustomers
@@ -40,11 +40,11 @@ const postCustomers = (req, res) =>{
              res.send(error.detail)
              return;
         };
-        res.status(201).send("{success: success}")
+        res.status(201).send({response: "success"})
     })
     })
     }else{
-        res.send("Cannot insert Null into name")
+        res.send({response: "Cannot insert Null into name"})
         return
     }
     }else if (query_status === "d") {

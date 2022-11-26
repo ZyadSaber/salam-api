@@ -75,8 +75,26 @@ const postCustomers = (req, res) =>{
         res.send(`query_status is ${query_status}`)
     }
 }
+const popCustomers = (req, res) =>{
+    pool.query(queries.popCustomers, (error, results)=>{
+        if (error){
+            res.send(error)
+            return;
+        }
+        const Results = results.rows
+        const Response = []
+        Results.map((item)=>{
+            let data = {}
+            data.value = item.customer_id
+            data.label = item.name
+            Response.push(data)
+        })
+        res.status(200).send(Response)
+    })
+} 
 
 module.exports = {
     getCustomers,
     postCustomers,
+    popCustomers
 }

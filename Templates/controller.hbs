@@ -1,0 +1,30 @@
+const pool = require("../../db.js");
+const queries = require('./queries');
+
+const get{{name}} = (req, res)=>{
+
+}
+
+const post{{name}} = (req, res) =>{
+    const {query_status} = req.body
+
+    if (query_status === "n") {
+
+    } else if (query_status === "u"){
+
+    } else if (query_status === "d"){
+
+    } else {
+        res.status(500).send({response: error in JSON})
+    }
+}
+
+const pop{{name}} = (req, res) => {
+
+}
+
+module.exports = {
+get{{name}},
+post{{name}},
+pop{{name}}
+}

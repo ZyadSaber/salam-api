@@ -3,7 +3,7 @@ const controller = require("./controller");
 
 const router = Router();
 
-router.get('/employees', controller.getEpmployees );
-router.post('/employees_dml', controller.postCustomers );
+router.get('/employees', controller.getEmployees );
+router.post('/employees_dml', controller.postEmployees );
 
 module.exports = router

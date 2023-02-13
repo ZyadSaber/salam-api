@@ -74,29 +74,26 @@ const postEmployees = (req, res) =>{
     }
 }
 
-const getRealTime = (req, res) => {
-    const {employee_id, type} = req.query
-    if (type === "attendance"){
-        pool.query(queries.getRealTimeAttendance, [employee_id], (error, res)=>{
-            if (error){
-                res.status(500).send(error)
-                return;
-            }
-            res.status(200).send(res.rows)
+const popEmployeeNameList = (req, res) =>{
+    pool.query(queries.popEmployeeNameList, (error, results)=>{
+        if (error){
+            res.send(error)
+            return;
+        }
+        const Results = results.rows
+        const Response = []
+        Results.map((item)=>{
+            let data = {}
+            data.value = item.employee_id
+            data.label = item.name
+            Response.push(data)
         })
-    } else if (type === "leaving"){
-           pool.query(queries.getRealTimeLeaving, [employee_id], (error, res)=>{
-            if (error){
-                res.status(500).send(error)
-                return;
-            }
-            res.status(200).send(res.rows)
-        })
-    }
+        res.status(200).send(Response)
+    })
 }
 
 module.exports = {
     getEmployees,
     postEmployees,
-    getRealTime
+    popEmployeeNameList
 }

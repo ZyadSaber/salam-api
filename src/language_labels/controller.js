@@ -9,11 +9,14 @@ const getLabels = (req, res) => {
                 res.status(500).send({ response: error })
                 return;
             }
-            console.log(result.rows[0].ar_name)
-            if (p_language == 1) {
-                res.send({ label: result.rows[0].en_name })
-            } else if (p_language == 2) {
-                res.send({ label: result.rows[0].ar_name })
+            if (result.rows.length != 0) {
+                if (p_language == 1) {
+                    res.send({ label: result.rows[0].en_name })
+                } else if (p_language == 2) {
+                    res.send({ label: result.rows[0].ar_name })
+                }
+            } else {
+                res.send({})
             }
         })
     } else {

@@ -3,36 +3,37 @@ const queries = require('./queries');
 
 const getLabels = (req, res) => {
     const { label, p_language } = req.query
-    if (label) {
-        pool.query(queries.getLabels, [label], (error, result) => {
-            if (error) {
-                res.status(500).send({ response: error })
-                return;
-            }
-            if (result.rows.length != 0) {
-                if (p_language == 1) {
-                    res.send({ label: result.rows[0].en_name })
-                } else if (p_language == 2) {
-                    res.send({ label: result.rows[0].ar_name })
-                }
-            } else {
-                res.send({})
-            }
-        })
-    } else {
-        res.status(500).send({ response: "null into label" })
-    }
-}
+    // if (label) {
 
-const postCustomers = (req, res) => {
-    const { name, email, phone, mobile, address, query_status, customer_id } = req.body;
-    if (query_status === "n") {
+    pool.query(queries.getEnglishNames, (error, result) => {
+        if (error) {
+            res.status(500).send({ response: error })
+            return;
+        }
+        if (p_language == "en") {
+            let en_labels = {}
+            result.rows.map((item) => {
+                en_labels[item.lang_code] = item.en_name
+            })
+            res.send(en_labels)
+        } else if (p_language == "ar") {
+            let ar_labels = {}
+            result.rows.map((item) => {
+                ar_labels[item.lang_code] = item.ar_name
+            })
+            res.send(ar_labels)
+        }
+    })
+    // pool.query(queries.getLabels, (error, result) => {
+    //     if (error) {
+    //         res.status(500).send({ response: error })
+    //         return;
+    //     }
 
-    } else if (query_status === "d") {
-
-    } else if (query_status === "u") {
-
-    }
+    // })
+    // } else {
+    //     res.status(500).send({ response: "null into label" })
+    // }
 }
 
 module.exports = {

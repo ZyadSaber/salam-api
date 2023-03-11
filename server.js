@@ -11,11 +11,11 @@ const employeeAttendance = require("./src/employee_attendance/routes")
 const employeeLeaving = require("./src/employee_leaving/routes")
 const users = require("./src/Users/routes")
 const labels = require("./src/language_labels/routes")
+const Assets = require("./src/Assets/routes")
 const cors = require('cors')
 const app = express(express);
 const port = 9090;
 const path = require('path')
-const pool = require("./db")
 
 app.use(express.json())
 app.use(cors())
@@ -33,6 +33,7 @@ app.use('/api/v1/employeesData', employeeAttendance)
 app.use('/api/v1/employeesData', employeeLeaving)
 app.use("/api/v1", users)
 app.use("/api/v1", labels)
+app.use("/api/v1", Assets)
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'))
     // res.status(404).sendFile("./Views/404.html", {root: __dirname})

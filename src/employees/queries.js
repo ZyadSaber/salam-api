@@ -8,6 +8,7 @@ const updateCustomer = "UPDATE employees SET name = $2, date_of_hiring = $3, add
 const popEmployeeNameList = "SELECT name, employee_id FROM employees";
 const getEmployeeAttendanceTime = "SELECT attendance_time FROM employees WHERE employee_id = $1";
 const getEmployeeLeavingTime = "SELECT leaving_time FROM employees WHERE employee_id = $1";
+const getEmployeeSalary = "SELECT job_title, salary FROM employees WHERE employee_id = $1"
 
 module.exports =  {
     getEmployees,
@@ -19,5 +20,6 @@ module.exports =  {
     updateCustomer,
     popEmployeeNameList,
     getEmployeeAttendanceTime,
-    getEmployeeLeavingTime
+    getEmployeeLeavingTime,
+    getEmployeeSalary
 }

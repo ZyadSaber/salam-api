@@ -1,1 +1,1 @@
-SELCT * FROM CUSTOMERS
+select leaving_time from employees

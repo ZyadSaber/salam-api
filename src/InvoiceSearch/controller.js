@@ -6,17 +6,23 @@ const items = require("../items/queries");
 
 let itemsNames = []
 pool.query(items.popCustomers, (error, popItems) => {
-    itemsNames = popItems.rows
+    if (popItems){
+        itemsNames = popItems.rows
+    }
 });
 
 let customerNames = []
 pool.query(customerQueries.popCustomers, (error, results)=>{
-    customerNames = results.rows
+    if(results){
+        customerNames = results.rows
+    }
 })
 
 let supplierNames = []
 pool.query(supplierQueries.popSuppliers, (error, results)=>{
-    supplierNames = results.rows
+    if(results){
+        supplierNames = results.rows
+    }
 })
 
 const getMasterTable = (req, res) => {

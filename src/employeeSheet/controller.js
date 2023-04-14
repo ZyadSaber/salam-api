@@ -1,5 +1,4 @@
 const pool = require("../../db.js");
-const queries = require('./queries');
 const employeeLeaving = require("../employee_leaving/queries.js");
 const employeeAttendance = require("../employee_attendance/queries.js");
 const employees = require("../employees/queries.js")

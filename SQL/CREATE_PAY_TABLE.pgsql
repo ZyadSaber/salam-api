@@ -1,1 +1,1 @@
-select * from casher_receipt_voucher
+select * from casher_receipt_voucher WHERE date BETWEEN '2023-04-01' AND '2023-04-01'

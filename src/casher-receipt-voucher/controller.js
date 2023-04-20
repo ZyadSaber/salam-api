@@ -2,10 +2,11 @@ const pool = require("../../db.js");
 const queries = require('./queries');
 
 const getCasherReceiptVoucher = (req, res) => {
-    pool.query(queries.getCAcherReceiptVoucherTableData, (error, results)=>{
+    const { date_from, date_to } = req.query
+    pool.query(queries.getCAcherReceiptVoucherTableData, [date_from, date_to], (error, results)=>{
         if(error){
             console.log(error)
-            res.status(500).send([{response: error.detail}])
+            res.send([])
             return;
         }
         let Response = (results.rows)

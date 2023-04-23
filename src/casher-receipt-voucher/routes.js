@@ -4,6 +4,6 @@ const controller = require("./controller");
 const router = Router();
 
 router.get('/get_casher_receipt_voucher_invoices', controller.getCasherReceiptVoucher)
-router.post('/customer_invoice_dml', controller.postCasherReceiptVoucher );
+router.post('/post_casher_receipt_voucher_invoices_dml', controller.postCasherReceiptVoucher );
 
 module.exports = router

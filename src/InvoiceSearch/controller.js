@@ -77,7 +77,7 @@ const getMasterTable = (req, res) => {
                 })
             }
 
-        } else if (invoice_type === "suppliers") {
+        } else if (invoice_type == 1) {
             if (person_id) {
                 pool.query(queries.getSupplierInvoicesAndID, [invoice_number, person_id], (error, results) => {
                     if (error) {
@@ -135,7 +135,7 @@ const getDetailTable = (req, res) => {
     pool.query(items.popCustomers, (error, results) => {
     })
     const { invoice_type, authorization, invoice_number } = req.query
-    if (invoice_type === "suppliers" && invoice_number) {
+    if (invoice_type == 1 && invoice_number) {
         pool.query(queries.getSupplierInvoiceDetails, [invoice_number], (error, results) => {
             if (error) {
                 res.status(500).send(error)
@@ -152,7 +152,7 @@ const getDetailTable = (req, res) => {
             })
             res.send(results.rows)
         })
-    } else if (invoice_type === "customers" && invoice_number) {
+    } else if (invoice_type === 2 && invoice_number) {
         pool.query(queries.getCustomerInvoiceDetails, [invoice_number], (error, results) => {
             if (error) {
                 res.status(500).send(error)
@@ -179,7 +179,7 @@ const postInvoiceSearch = (req, res) => {
 
 const getCustomerSupplierTable = (req, res) => {
     const { invoice_type, authorization } = req.query
-    if (invoice_type === "customers") {
+    if (invoice_type == 2) {
         pool.query(customerQueries.popCustomers, (error, results) => {
             if (error) {
                 res.status(500).send({ response: error })
@@ -195,7 +195,7 @@ const getCustomerSupplierTable = (req, res) => {
             })
             res.status(200).send(Response)
         })
-    } else if (invoice_type === "suppliers") {
+    } else if (invoice_type == 1) {
         pool.query(supplierQueries.popSuppliers, (error, results) => {
             if (error) {
                 res.status(500).send({ response: error })

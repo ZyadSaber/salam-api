@@ -16,7 +16,7 @@ const labels = require("./src/language_labels/routes")
 const Assets = require("./src/Assets/routes")
 const cors = require('cors')
 const app = express(express);
-const port = 9090;
+const port = 5000;
 const path = require('path')
 
 app.use(express.json())

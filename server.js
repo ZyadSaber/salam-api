@@ -13,7 +13,8 @@ const EmployeeSheet = require("./src/employeeSheet/routes");
 const casherReceiptVoucher = require("./src/casher-receipt-voucher/routes")
 const users = require("./src/Users/routes")
 const labels = require("./src/language_labels/routes")
-const Assets = require("./src/Assets/routes")
+const Assets = require("./src/Assets/routes");
+const Home = require("./src/dashboard-home/routes")
 const cors = require('cors')
 const app = express(express);
 const port = 5000;
@@ -35,6 +36,7 @@ app.use('/api/v1/employeesData', employeeAttendance)
 app.use('/api/v1/employeesData', employeeLeaving)
 app.use('/api/v1/employeesData', EmployeeSheet)
 app.use('/api/v1/income_expense', casherReceiptVoucher)
+app.use('/api/v1/home', Home)
 app.use("/api/v1", users)
 app.use("/api/v1", labels)
 app.use("/api/v1", Assets)

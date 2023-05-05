@@ -17,7 +17,7 @@ const Assets = require("./src/Assets/routes");
 const Home = require("./src/dashboard-home/routes")
 const cors = require('cors')
 const app = express(express);
-const port = 5000;
+const port = 9090;
 const path = require('path')
 
 app.use(express.json())

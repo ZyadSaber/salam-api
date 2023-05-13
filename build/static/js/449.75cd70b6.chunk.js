@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkelsalamapp=self.webpackChunkelsalamapp||[]).push([[449],{8449:function(e,a,s){s.r(a);var n=s(2791),l=s(184),p=function(){return(0,l.jsx)(l.Fragment,{children:(0,l.jsx)("h1",{children:"ExpensesTotalsPage"})})};a.default=(0,n.memo)(p)}}]);
+//# sourceMappingURL=449.75cd70b6.chunk.js.map

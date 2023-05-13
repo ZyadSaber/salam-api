@@ -3,11 +3,11 @@ const queries = require('./queries');
 
 const getDashBoard = (req, res)=>{
     res.send({
-        labels: [],
+        labels: [1],
         datasets: [
             {
-                label: '',
-                data: [],
+                label: '1',
+                data: [1],
                 // backgroundColor: [
                 //     "rgba(75,192,192,1)",
                 //     "#ecf0f1",

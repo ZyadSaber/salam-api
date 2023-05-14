@@ -5,42 +5,49 @@ const supplierQueries = require("../suppliers/queries")
 const postSupplierInvoice = (req, res) =>{
     const {supplier_id, date, items,query_status, invoice_note, total, discount, total_after_discount, paid, credit} = req.body;
     if (query_status === "n") {
+        const id = Date.now()
         // add supplier_invoice
         if (supplier_id && items.length !== 0 && date) {
             pool.query(supplierQueries.checkIdExists, [supplier_id], (error, result)=>{
                 if(!result.rows.length){
-                    res.status(406).send({response: "Supplier_id does not exist"});
+                    res.status(500).send({response: "Supplier_id does not exist"});
                     return
                 }
             })
-            const id = Date.now()
-            pool.query(queries.addSupplierInvoice, [id, supplier_id, date, invoice_note, total, discount, total_after_discount, paid, credit], (error, result)=>{
-                if(error){
-                    console.log(error)
-                    res.status(500).send(error)
-                    return
+            items.map((item)=>{
+                if(item.item_id == 0){
+                    return;
                 }
-                items.map((item)=>{
-                    pool.query(queries.addSupplierInvoiceItems, [id, item.item_id, item.width, item.height, item.size, item.quantity, item.price, item.total, item.notes], (error, result)=>{
-                    if(error){
-                        console.log(error)
-                        res.status(500).send(error)
-                        return
-                    }
-                    })
-                })
-                res.status(201).send({response: "success"})
+                console.log("dd")
             })
+            // pool.query(queries.addSupplierInvoice, [id, supplier_id, date, invoice_note, total, discount, total_after_discount, paid, credit], (error, result)=>{
+            //     if(error){
+            //         console.log(error)
+            //         res.status(500).send(error)
+            //         return
+            //     }
+            //     items.map((item)=>{
+            //         pool.query(queries.addSupplierInvoiceItems, [id, item.item_id, item.width, item.height, item.size, item.quantity, item.price, item.total, item.notes], (error, result)=>{
+            //         if(error){
+            //             console.log(error)
+            //             res.status(500).send(error)
+            //             return
+            //         }
+            //         })
+            //     })
+            //     res.status(201).send({response: "success"})
+            // })
+            res.send({response: "success"})
     }else{
         res.status(500).send({response: "Error in JSON"})
         return
     }
     }else if (query_status === "d") {
-    
+     
     }else if (query_status === "u") {
 
     }else{
-        res.status(500).json({status: "can't insert NULL into query_status "})
+        res.status(500).json({response: "can't insert NULL into query_status"})
     }
 }
 

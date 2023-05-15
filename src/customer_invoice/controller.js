@@ -14,14 +14,51 @@ const postCustomerInvoice = (req, res) =>{
                 }
             })
             const id = Date.now()
-            pool.query(queries.addCustomerInvoice, [id, customer_id, date, invoice_note, total, discount, total_after_discount, paid, credit], (error, result)=>{
+            const verifyData = ()=>{
+                let reply
+                items.map((item)=>{
+                if(
+                    item.item_id == 0 
+                    || 
+                    item.width == 0
+                    ||
+                    item.height == 0
+                    ||
+                    item.size == 0
+                    ||
+                    item.quantity == 0
+                    ||
+                    item.price == 0
+                    ||
+                    item.total == 0
+                    ){
+                    reply = true
+                }
+            })
+            return reply
+            }
+            if(verifyData()){
+                res.status(500).send({response: "review your data again"})
+                return
+            }else {
+                pool.query(queries.addCustomerInvoice, [id, customer_id, date, invoice_note, total, discount, total_after_discount, paid, credit], (error, result)=>{
                 if(error){
                     console.log(error)
                     res.status(500).send(error)
                     return
                 }
                 items.map((item)=>{
+                    //add to invoice details
                     pool.query(queries.addCustomerInvoiceItems, [id, item.print_id, item.item_id, item.width, item.height, item.size, item.quantity, item.price, item.total, item.notes], (error, result)=>{
+                    if(error){
+                        console.log(error)
+                        res.status(500).send(error)
+                        return
+                    }
+                    })
+                    //add to item inventory
+                    const total_size = item.size * item.quantity
+                    pool.query(queries.addItemInventory, [id, item.item_id, total_size], (error, result)=>{
                     if(error){
                         console.log(error)
                         res.status(500).send(error)
@@ -31,6 +68,7 @@ const postCustomerInvoice = (req, res) =>{
                 })
                 res.status(201).send({response: "success"})
             })
+            }
     }else{
         res.status(500).send({response: "Error in JSON"})
         return

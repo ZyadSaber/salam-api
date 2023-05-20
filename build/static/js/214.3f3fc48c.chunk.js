@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkelsalamapp=self.webpackChunkelsalamapp||[]).push([[214],{5214:function(e,a,l){l.r(a);var n=l(2791),s=l(184),t=function(){return(0,s.jsx)(s.Fragment,{children:(0,s.jsx)("h1",{children:"MonthlyTotalsPage"})})};a.default=(0,n.memo)(t)}}]);
-//# sourceMappingURL=214.3f3fc48c.chunk.js.map

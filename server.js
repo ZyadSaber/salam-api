@@ -14,7 +14,8 @@ const casherReceiptVoucher = require("./src/casher-receipt-voucher/routes")
 const users = require("./src/Users/routes")
 const labels = require("./src/language_labels/routes")
 const Assets = require("./src/Assets/routes");
-const Home = require("./src/dashboard-home/routes")
+const Home = require("./src/dashboard-home/routes");
+const ExpenseType = require("./src/expenses-type/routes")
 const cors = require('cors')
 const app = express(express);
 const port = 9090;
@@ -28,6 +29,7 @@ app.use('/api/v1/basicData', cusotmerRoustes)
 app.use('/api/v1/basicData', suppliersRoutes)
 app.use('/api/v1/basicData', itemsRoutes);
 app.use('/api/v1/basicData', printOption);
+app.use('/api/v1/basicData', ExpenseType);
 app.use("/api/v1/invoices", supplierInvoiceRouter)
 app.use("/api/v1/invoices", customerInvoiceRouter)
 app.use("/api/v1/invoices", InvoiceSearch)

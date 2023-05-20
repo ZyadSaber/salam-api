@@ -49,7 +49,7 @@ const postCustomers = (req, res) => {
                     res.send({ response: error.detail })
                     return;
                 };
-                res.status(200).send({ response: success })
+                res.status(200).send({ response: "success" })
             })
         })
     } else if (query_status === "u") {

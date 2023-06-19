@@ -1,1 +1,0 @@
-SELECT item_id, name FROM items

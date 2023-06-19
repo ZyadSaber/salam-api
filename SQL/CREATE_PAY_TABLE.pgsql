@@ -1,1 +1,0 @@
-select * from casher_receipt_voucher

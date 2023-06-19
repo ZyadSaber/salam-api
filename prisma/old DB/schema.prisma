@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user_name     String @unique
+  password_hash String
+
+  first_name String
+  last_name  String?
+}
+
+model casher_receipt_voucher {
+  receipt_voucher_id Int @id @default(autoincrement())
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  date DateTime @default(now())
+
+  amount       Decimal
+  voucher_type String?
+  customer_id  Int?
+  supplier_id  Int?
+  notes        String?
+
+  customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
+  suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])
+}
+
+model customer_invoices {
+  customer_invoice_id String @id
+  customer_id         Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  date                 String
+  total                Decimal
+  discount             Decimal
+  total_after_discount Decimal
+  paid                 Decimal
+  credit               Decimal
+  invoice_note         String?
+
+  customer_invoices_items_details customer_invoices_items_details[]
+  item_inventory                  item_inventory[]
+  customers_data                  customers_data                    @relation(fields: [customer_id], references: [customer_id])
+}
+
+model customer_invoices_items_details {
+  row_key             Int    @id @default(autoincrement())
+  customer_invoice_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  print_option_id Int
+  item_id         Int
+  width           Int
+  height          Int
+  size            Int
+  quantity        Int
+  price           Int
+  total           Int
+
+  notes String?
+
+  customer_invoices customer_invoices @relation(fields: [customer_invoice_id], references: [customer_invoice_id])
+  items_data        items_data        @relation(fields: [item_id], references: [item_id])
+  print_options     print_options     @relation(fields: [print_option_id], references: [print_option_id])
+}
+
+model customers_data {
+  customer_id Int      @id @default(autoincrement())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  customer_name String
+
+  email                  String?
+  phone                  String?
+  address                String?
+  casher_receipt_voucher casher_receipt_voucher[]
+  customer_invoices      customer_invoices[]
+}
+
+model employee_attendance {
+  attendance_no Int @id @default(autoincrement())
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  date DateTime
+
+  employee_id     Int
+  attendance_time String
+  reason          String?
+  absent          String     @db.VarChar(1)
+  late_time       Int
+  employees       employees? @relation(fields: [employee_id], references: [employee_id])
+}
+
+model employee_leaving {
+  leaving_id Int @id @default(autoincrement())
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  date         DateTime
+  employee_id  Int
+  leaving_time String
+  over_time    Int
+  early_time   Int
+
+  notes String?
+
+  employees employees @relation(fields: [employee_id], references: [employee_id])
+}
+
+model employees {
+  employee_id         Int                   @id @default(autoincrement())
+  name                String?
+  address             String?
+  phone               String?
+  mobile              String?
+  job_title           String?
+  email               String?
+  salary              Int
+  attendance_time     String?
+  leaving_time        String?
+  date_of_hiring      String?
+  holiday             Int?
+  employee_attendance employee_attendance[]
+  employee_leaving    employee_leaving[]
+}
+
+model expense_types {
+  expense_type_id Int      @id @default(autoincrement())
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  expense_type_name String
+
+  expense_type_note String?
+}
+
+model item_inventory {
+  transaction_id      Int                @id @default(autoincrement())
+  item_id             Int
+  in_inv              Decimal
+  out_inv             Decimal
+  customer_invoice_id String?
+  supplier_invoice_id Int?
+  customer_invoices   customer_invoices? @relation(fields: [customer_invoice_id], references: [customer_invoice_id])
+  items_data          items_data         @relation(fields: [item_id], references: [item_id])
+  supplier_invoices   supplier_invoices? @relation(fields: [supplier_invoice_id], references: [supplier_invoice_id])
+}
+
+model items_data {
+  item_id    Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  item_name String
+  item_unit String
+
+  item_description                String?
+  customer_invoices_items_details customer_invoices_items_details[]
+  item_inventory                  item_inventory[]
+  supplier_invoices_items_details supplier_invoices_items_details[]
+}
+
+model language_codes {
+  language_code String   @id
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  english_name String
+  arabic_name  String
+}
+
+model print_options {
+  print_option_id Int      @id @default(autoincrement())
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  print_option_name String
+
+  print_option_note String?
+
+  customer_invoices_items_details customer_invoices_items_details[]
+}
+
+model supplier_invoices {
+  supplier_invoice_id Int @id
+  supplier_id         Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  supplier_invoice_date DateTime
+
+  supplier_invoice_total          Decimal
+  supplier_invoice_discount       Decimal
+  supplier_invoice_after_discount Decimal
+  supplier_invoice_paid           Decimal
+  supplier_invoice_credit         Decimal
+
+  invoice_note String?
+
+  item_inventory                  item_inventory[]
+  supplier_invoices_items_details supplier_invoices_items_details[]
+  suppliers_data                  suppliers_data?                   @relation(fields: [supplier_id], references: [supplier_id])
+}
+
+model supplier_invoices_items_details {
+  row_key             Int @id @default(autoincrement())
+  supplier_invoice_id Int
+  item_id             Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  supplier_invoice_item_width    Int
+  supplier_invoice_item_height   Int
+  supplier_invoice_item_size     Int
+  supplier_invoice_item_quantity Int
+  supplier_invoice_item_price    Int
+  supplier_invoice_item_total    Int
+  supplier_invoice_item_notes    String?
+
+  items_data        items_data?        @relation(fields: [item_id], references: [item_id])
+  supplier_invoices supplier_invoices? @relation(fields: [supplier_invoice_id], references: [supplier_invoice_id])
+}
+
+model suppliers_data {
+  supplier_id Int      @id @default(autoincrement())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  supplier_name String
+
+  email                  String?
+  phone                  String?
+  address                String?
+  casher_receipt_voucher casher_receipt_voucher[]
+  supplier_invoices      supplier_invoices[]
+}

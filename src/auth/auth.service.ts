@@ -69,7 +69,10 @@ export class AuthService {
   ): Promise<{
     authorization: string;
     response?: string;
-    first_name?: string;
+    display_name?: string;
+    build_name?: string;
+    role?: string;
+    app_name?: string;
   }> {
     const payLoad = {
       sub: userId,
@@ -86,7 +89,10 @@ export class AuthService {
     return {
       response: 'success',
       authorization: token,
-      first_name: first_name,
+      display_name: first_name,
+      build_name: 'build 1.3.1',
+      role: 'admin',
+      app_name: this.config.get('APP_NAME'),
     };
   }
 }

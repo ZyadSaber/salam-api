@@ -33,8 +33,11 @@ export class InvoiceSearchService {
   async customerSupplierMain(params: customerSupplierMainTableParams) {
     if (params.invoice_type === 'C') {
       const invoices = await this.prisma.customer_invoices.findMany({
+        take: +params.take | 10000000000,
+        skip: +params.skip | 0,
         where: {
           customer_invoice_id: +params.invoice_no || undefined,
+          customer_id: +params.holder_number || undefined,
         },
       });
       const customersData = await this.CustomersService.getCustomersList();
@@ -46,8 +49,11 @@ export class InvoiceSearchService {
         invoice.invoice_holder_name = filter[0].label;
         //@ts-ignore
         invoice.invoice_id = invoice.customer_invoice_id;
+        const InvoiceDate = new Date(invoice.customer_invoice_date);
         //@ts-ignore
-        invoice.invoice_date = invoice.customer_invoice_date;
+        invoice.invoice_date = `${InvoiceDate.getFullYear()}-${
+          InvoiceDate.getMonth() + 1
+        }-${InvoiceDate.getDate()}`;
         //@ts-ignore
         invoice.invoice_after_discount =
           invoice.customer_invoice_after_discount;
@@ -67,8 +73,11 @@ export class InvoiceSearchService {
       return { data: invoices };
     } else if (params.invoice_type === 'S') {
       const invoices = await this.prisma.supplier_invoices.findMany({
+        take: +params.take | 10000000000,
+        skip: +params.skip | 0,
         where: {
           supplier_invoice_id: +params.invoice_no || undefined,
+          supplier_id: +params.holder_number || undefined,
         },
       });
       const supplierData = await this.SuppliersService.getSuppliersList();
@@ -80,8 +89,11 @@ export class InvoiceSearchService {
         invoice.invoice_holder_name = filter[0].label;
         //@ts-ignore
         invoice.invoice_id = invoice.supplier_invoice_id;
+        const InvoiceDate = new Date(invoice.supplier_invoice_date);
         //@ts-ignore
-        invoice.invoice_date = invoice.supplier_invoice_date;
+        invoice.invoice_date = `${InvoiceDate.getFullYear()}-${
+          InvoiceDate.getMonth() + 1
+        }-${InvoiceDate.getDate()}`;
         //@ts-ignore
         invoice.invoice_after_discount =
           invoice.supplier_invoice_after_discount;
@@ -124,9 +136,9 @@ export class InvoiceSearchService {
             printOption.value === invoice.customer_invoice_print_option_id,
         );
         //@ts-ignore
-        invoice.invoice_item_name = filter[0].label;
+        invoice.invoice_item_name = `${filterPrintOption[0].label} / ${filter[0].label}`;
         //@ts-ignore
-        invoice.invoice_item_print_option = filterPrintOption[0].label;
+        // invoice.invoice_item_print_option = ;
         //@ts-ignore
         invoice.invoice_item_width = invoice.customer_invoice_item_width;
         delete invoice.customer_invoice_item_width;

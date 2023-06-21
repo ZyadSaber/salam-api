@@ -8,6 +8,9 @@ export class customerSupplierListParams {
 
 export class customerSupplierMainTableParams extends customerSupplierListParams {
   invoice_no?: number;
+  take?: number;
+  skip?: number;
+  holder_number?: number;
 }
 
 export class customerSupplierDetailTableParams extends customerSupplierListParams {

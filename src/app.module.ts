@@ -17,6 +17,7 @@ import { PrintOptionsModule } from './print_options/print_options.module';
 import { ExpensesTypeModule } from './expenses_type/expenses_type.module';
 import { InvoiceSearchModule } from './invoice_search/invoice_search.module';
 import { EmployeeDataModule } from './employee_data/employee_data.module';
+import { ChartsModule } from './charts/charts.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { EmployeeDataModule } from './employee_data/employee_data.module';
     ExpensesTypeModule,
     InvoiceSearchModule,
     EmployeeDataModule,
+    ChartsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

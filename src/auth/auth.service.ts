@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
-import { singUpType, singInType } from 'src/types';
+import { singUpType, singInType, getPages } from 'src/types';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
@@ -94,5 +94,9 @@ export class AuthService {
       role: 'admin',
       app_name: this.config.get('APP_NAME'),
     };
+  }
+
+  getPages(params: getPages) {
+    return params;
   }
 }

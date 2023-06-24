@@ -22,20 +22,23 @@ model users {
   first_name String
   last_name  String?
 
-  bookmarks bookmark[]
+  user_role Int?
+  app_pages app_pages? @relation(fields: [user_role], references: [page_id])
 }
 
-model bookmark {
-  id         Int      @id @default(autoincrement())
+model app_pages {
+  page_id    Int      @id @default(autoincrement())
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  title       String
-  description String?
-  link        String
+  page_name     String  @unique()
+  Page_Link     String  @unique()
+  page_disabled String? @default("N") @db.VarChar(1)
+  run_in_modal  String? @default("N") @db.VarChar(1)
 
-  user_id Int
-  user    users @relation(fields: [user_id], references: [id])
+  parent_name String? @default("")
+
+  users users[]
 }
 
 model language_code {
@@ -58,7 +61,9 @@ model suppliers_data {
   phone   String?
   address String?
 
-  supplier_invoices supplier_invoices[]
+  supplier_invoices    supplier_invoices[]
+  cash_receipt_voucher cash_receipt_voucher[]
+  cash_payment_voucher cash_payment_voucher[]
 }
 
 model customers_data {
@@ -68,10 +73,12 @@ model customers_data {
 
   customer_name String
 
-  email             String?
-  phone             String?
-  address           String?
-  customer_invoices customer_invoices[]
+  email                String?
+  phone                String?
+  address              String?
+  customer_invoices    customer_invoices[]
+  cash_receipt_voucher cash_receipt_voucher[]
+  cash_payment_voucher cash_payment_voucher[]
 }
 
 model items_data {
@@ -223,4 +230,39 @@ model employees_data {
   employee_attendance_time String
   employee_leaving_time    String
   date_of_hiring           String?
+}
+
+model cash_receipt_voucher {
+  receipt_voucher_id Int @id @default(autoincrement())
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  voucher_date DateTime @default(now())
+
+  voucher_amount Decimal
+  customer_id    Int?
+  supplier_id    Int?
+  voucher_other  String?
+  notes          String?
+
+  customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
+  suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])
+}
+
+model cash_payment_voucher {
+  payment_voucher_id Int @id @default(autoincrement())
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  voucher_date DateTime @default(now())
+
+  voucher_amount Decimal
+  customer_id    Int?
+  supplier_id    Int?
+  notes          String?
+
+  customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
+  suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])
 }

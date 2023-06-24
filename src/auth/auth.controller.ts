@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { singUpType } from '../types';
+import { singUpType, getPages } from '../types';
 
 @Controller('api/auth_security')
 export class AuthController {
@@ -14,5 +14,10 @@ export class AuthController {
   @Post('sign_in')
   signUp(@Body() dto: singUpType) {
     return this.authService.signIn(dto);
+  }
+
+  @Get('app_pages')
+  appPages(@Query() params: getPages) {
+    return this.authService.getPages(params);
   }
 }

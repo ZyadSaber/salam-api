@@ -19,3 +19,12 @@ export class singInType {
   @IsNotEmpty()
   password: string;
 }
+
+export class getPages {
+  @IsNotEmpty()
+  @IsString()
+  role: string;
+  @IsNotEmpty()
+  @IsString()
+  user_name: string;
+}

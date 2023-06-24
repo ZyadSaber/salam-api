@@ -28,4 +28,14 @@ export class InvoiceSearchController {
   ) {
     return this.InvoiceSearchService.customerSupplierDetail(params);
   }
+
+  @Get('customer_invoices_for_today')
+  getCustomerInvoicesToday() {
+    return this.InvoiceSearchService.getCustomersInvoicesToday();
+  }
+
+  @Get('supplier_invoices_for_today')
+  getSupplierInvoicesToday() {
+    return this.InvoiceSearchService.getCustomersInvoicesToday();
+  }
 }

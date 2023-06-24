@@ -18,6 +18,7 @@ import { ExpensesTypeModule } from './expenses_type/expenses_type.module';
 import { InvoiceSearchModule } from './invoice_search/invoice_search.module';
 import { EmployeeDataModule } from './employee_data/employee_data.module';
 import { ChartsModule } from './charts/charts.module';
+import { CasherReceiptVoucherModule } from './casher_receipt_voucher/casher_receipt_voucher.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ChartsModule } from './charts/charts.module';
     InvoiceSearchModule,
     EmployeeDataModule,
     ChartsModule,
+    CasherReceiptVoucherModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

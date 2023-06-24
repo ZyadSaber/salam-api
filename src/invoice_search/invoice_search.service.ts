@@ -33,8 +33,6 @@ export class InvoiceSearchService {
   async customerSupplierMain(params: customerSupplierMainTableParams) {
     if (params.invoice_type === 'C') {
       const invoices = await this.prisma.customer_invoices.findMany({
-        take: +params.take | 10000000000,
-        skip: +params.skip | 0,
         where: {
           customer_invoice_id: +params.invoice_no || undefined,
           customer_id: +params.holder_number || undefined,
@@ -205,5 +203,36 @@ export class InvoiceSearchService {
     } else {
       return [];
     }
+  }
+
+  async getCustomersInvoicesToday() {
+    const dateOfToday = new Date();
+    dateOfToday.setHours(0, 0, 0, 0);
+    const invoices = await this.prisma.customer_invoices.findMany({
+      where: {
+        customer_invoice_date: {
+          gte: dateOfToday,
+        },
+      },
+    });
+    const customerData = await this.CustomersService.getCustomersList();
+    invoices.map((invoice) => {
+      const filter = customerData.filter(
+        (customer) => customer.value === invoice.customer_id,
+      );
+      //@ts-ignore
+      invoice.invoice_holder_name = filter[0].label;
+      delete invoice.created_at;
+      delete invoice.updated_at;
+      const date = new Date(invoice.customer_invoice_date);
+      //@ts-ignore
+      invoice.customer_invoice_date = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
+      return invoice;
+    });
+    return {
+      data: invoices,
+    };
   }
 }

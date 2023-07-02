@@ -3,26 +3,26 @@ import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import { CustomersService } from '../customers/customers.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import {
-  paramsType,
-  newReceiptVoucher,
-  editReceiptVoucher,
-  deleteReceiptVoucher,
+  newPaymentVoucher,
+  editPaymentVoucher,
+  deletePaymentVoucher,
+  paramsPaymentType,
 } from '../types';
 
 @Injectable()
-export class CasherReceiptVoucherService {
+export class CasherPaymentVoucherService {
   constructor(
     private prisma: PrismaModuleService,
     private CustomersService: CustomersService,
     private SuppliersService: SuppliersService,
   ) {}
 
-  async getMainTable(params: paramsType) {
+  async getMainTable(params: paramsPaymentType) {
     const calculatedDateFrom = new Date(params.date_from);
     calculatedDateFrom.setHours(0, 0, 0, 0);
 
     if (params.date_from && params.date_to) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
+      const getRecords = await this.prisma.cash_payment_voucher.findMany({
         where: {
           voucher_date: {
             gte: calculatedDateFrom,
@@ -71,7 +71,7 @@ export class CasherReceiptVoucherService {
       });
       return { data: getRecords };
     } else if (params.date_from) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
+      const getRecords = await this.prisma.cash_payment_voucher.findMany({
         where: {
           voucher_date: {
             gte: calculatedDateFrom,
@@ -117,7 +117,7 @@ export class CasherReceiptVoucherService {
       });
       return { data: getRecords };
     } else if (params.date_to) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
+      const getRecords = await this.prisma.cash_payment_voucher.findMany({
         where: {
           voucher_date: {
             lte: new Date(params.date_to),
@@ -162,7 +162,7 @@ export class CasherReceiptVoucherService {
         voucher.voucher_id = voucherId;
       });
     } else {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany();
+      const getRecords = await this.prisma.cash_payment_voucher.findMany();
       const customersData = await this.CustomersService.getCustomersList();
       const supplierData = await this.SuppliersService.getSuppliersList();
       getRecords.map((voucher) => {
@@ -204,10 +204,10 @@ export class CasherReceiptVoucherService {
     }
   }
 
-  async newReceiptVoucher(dto: newReceiptVoucher) {
+  async newPaymentVoucher(dto: newPaymentVoucher) {
     if (dto.voucher_type === 'C') {
       try {
-        await this.prisma.cash_receipt_voucher.create({
+        await this.prisma.cash_payment_voucher.create({
           data: {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
@@ -223,7 +223,7 @@ export class CasherReceiptVoucherService {
       }
     } else if (dto.voucher_type) {
       try {
-        await this.prisma.cash_receipt_voucher.create({
+        await this.prisma.cash_payment_voucher.create({
           data: {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
@@ -239,7 +239,7 @@ export class CasherReceiptVoucherService {
       }
     } else {
       try {
-        await this.prisma.cash_receipt_voucher.create({
+        await this.prisma.cash_payment_voucher.create({
           data: {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
@@ -253,21 +253,19 @@ export class CasherReceiptVoucherService {
         throw error;
       }
     }
-
-    return { response: 'success' };
   }
 
-  async editReceiptVoucher(dto: editReceiptVoucher) {
-    const existVoucher = await this.prisma.cash_receipt_voucher.findUnique({
+  async editPaymentVoucher(dto: editPaymentVoucher) {
+    const existVoucher = await this.prisma.cash_payment_voucher.findUnique({
       where: {
-        receipt_voucher_id: dto.receipt_voucher_id,
+        payment_voucher_id: dto.payment_voucher_id,
       },
     });
     if (existVoucher) {
       if (existVoucher.customer_id) {
-        await this.prisma.cash_receipt_voucher.update({
+        await this.prisma.cash_payment_voucher.update({
           where: {
-            receipt_voucher_id: +dto.receipt_voucher_id,
+            payment_voucher_id: +dto.payment_voucher_id,
           },
           data: {
             voucher_date: new Date(dto.voucher_date),
@@ -278,9 +276,9 @@ export class CasherReceiptVoucherService {
         });
         return { response: 'success' };
       } else if (existVoucher.supplier_id) {
-        await this.prisma.cash_receipt_voucher.update({
+        await this.prisma.cash_payment_voucher.update({
           where: {
-            receipt_voucher_id: +dto.receipt_voucher_id,
+            payment_voucher_id: +dto.payment_voucher_id,
           },
           data: {
             voucher_date: new Date(dto.voucher_date),
@@ -291,9 +289,9 @@ export class CasherReceiptVoucherService {
         });
         return { response: 'success' };
       } else {
-        await this.prisma.cash_receipt_voucher.update({
+        await this.prisma.cash_payment_voucher.update({
           where: {
-            receipt_voucher_id: +dto.receipt_voucher_id,
+            payment_voucher_id: +dto.payment_voucher_id,
           },
           data: {
             voucher_date: new Date(dto.voucher_date),
@@ -311,16 +309,16 @@ export class CasherReceiptVoucherService {
     }
   }
 
-  async deleteReceiptVoucher(dto: deleteReceiptVoucher) {
-    const existVoucher = await this.prisma.cash_receipt_voucher.findUnique({
+  async deletePaymentVoucher(dto: deletePaymentVoucher) {
+    const existVoucher = await this.prisma.cash_payment_voucher.findUnique({
       where: {
-        receipt_voucher_id: dto.receipt_voucher_id,
+        payment_voucher_id: dto.payment_voucher_id,
       },
     });
     if (existVoucher) {
-      await this.prisma.cash_receipt_voucher.delete({
+      await this.prisma.cash_payment_voucher.delete({
         where: {
-          receipt_voucher_id: +dto.receipt_voucher_id,
+          payment_voucher_id: +dto.payment_voucher_id,
         },
       });
       return { response: 'success' };

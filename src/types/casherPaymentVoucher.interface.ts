@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class newReceiptVoucher {
+export class newPaymentVoucher {
   @IsString()
   @IsNotEmpty()
   voucher_date: string;
@@ -14,10 +14,10 @@ export class newReceiptVoucher {
   notes?: string;
 }
 
-export class editReceiptVoucher {
+export class editPaymentVoucher {
   @IsNumber()
   @IsNotEmpty()
-  receipt_voucher_id: number;
+  payment_voucher_id: number;
   @IsString()
   @IsNotEmpty()
   voucher_date: string;
@@ -30,13 +30,13 @@ export class editReceiptVoucher {
   notes?: string;
 }
 
-export class deleteReceiptVoucher {
+export class deletePaymentVoucher {
   @IsNumber()
   @IsNotEmpty()
-  receipt_voucher_id: number;
+  payment_voucher_id: number;
 }
 
-export class paramsType {
+export class paramsPaymentType {
   date_from?: string;
   date_to?: string;
 }

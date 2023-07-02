@@ -243,7 +243,6 @@ model cash_receipt_voucher {
   voucher_amount Decimal
   customer_id    Int?
   supplier_id    Int?
-  voucher_other  String?
   notes          String?
 
   customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])

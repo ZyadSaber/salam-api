@@ -32,4 +32,14 @@ export class CasherReceiptVoucherController {
   newRecord(@Body() dto: newReceiptVoucher) {
     return this.CasherReceiptVoucherService.newReceiptVoucher(dto);
   }
+
+  @Put('main_table_dml')
+  editRecord(@Body() dto: editReceiptVoucher) {
+    return this.CasherReceiptVoucherService.editReceiptVoucher(dto);
+  }
+
+  @Delete('main_table_dml')
+  deleteRecord(@Body() dto: deleteReceiptVoucher) {
+    return this.CasherReceiptVoucherService.deleteReceiptVoucher(dto);
+  }
 }

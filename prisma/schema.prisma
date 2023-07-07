@@ -22,8 +22,21 @@ model users {
   first_name String
   last_name  String?
 
-  user_role Int?
-  app_pages app_pages? @relation(fields: [user_role], references: [page_id])
+  user_role_id Int?
+  user_role    user_role? @relation(fields: [user_role_id], references: [user_role_id])
+}
+
+model user_role {
+  user_role_id Int      @id @default(autoincrement())
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user_role_name String @unique()
+  user_access    String @default("N") @db.VarChar(1)
+
+  page_id   Int
+  app_pages app_pages? @relation(fields: [page_id], references: [page_id])
+  users     users[]
 }
 
 model app_pages {
@@ -32,13 +45,12 @@ model app_pages {
   updated_at DateTime @updatedAt
 
   page_name     String  @unique()
-  Page_Link     String  @unique()
+  page_link     String  @unique()
   page_disabled String? @default("N") @db.VarChar(1)
   run_in_modal  String? @default("N") @db.VarChar(1)
 
-  parent_name String? @default("")
-
-  users users[]
+  parent_name String?     @default("")
+  user_role   user_role[]
 }
 
 model language_code {

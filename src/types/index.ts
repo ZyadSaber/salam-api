@@ -11,3 +11,4 @@ export * from './invoiceSearch.interface';
 export * from './employeeData.interface';
 export * from './chasherReceiptVoucher.interface';
 export * from './casherPaymentVoucher.interface';
+export * from './pageName.interface';

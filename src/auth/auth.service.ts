@@ -26,6 +26,7 @@ export class AuthService {
           password_hash: passwordHash,
           first_name: dto.first_name,
           last_name: dto.last_name,
+          // dto:
         },
       });
 
@@ -96,7 +97,11 @@ export class AuthService {
     };
   }
 
-  getPages(params: getPages) {
-    return params;
+  async getUsers() {
+    const users = await this.prisma.users.findMany();
+    users.map((user) => {
+      delete user.password_hash;
+    });
+    return { data: users };
   }
 }

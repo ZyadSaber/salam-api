@@ -190,4 +190,262 @@ export class SystemReportsService {
       };
     }
   }
+
+  async getItemsSummary(Params: { item_id: string }) {
+    if (Params.item_id && Params.item_id !== '') {
+      let ItemsSummaryData: any = [];
+
+      const customersDetailsInvoices =
+        await this.prisma.customer_invoices_items_details.findMany({
+          where: {
+            customer_invoice_item_id: +Params.item_id,
+          },
+          include: {
+            items_data: {
+              select: {
+                item_name: true,
+              },
+            },
+            customer_invoices: {
+              include: {
+                customers_data: {
+                  select: {
+                    customer_name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+      const suppliersDetailsInvoices =
+        await this.prisma.supplier_invoices_items_details.findMany({
+          where: {
+            supplier_invoice_item_id: +Params.item_id,
+          },
+          include: {
+            items_data: {
+              select: {
+                item_name: true,
+              },
+            },
+            supplier_invoices: {
+              include: {
+                suppliers_data: {
+                  select: {
+                    supplier_name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+      customersDetailsInvoices.map((item) => {
+        let obj: any = {};
+        obj.invoice_id = item.customer_invoice_id;
+        obj.rowKey = ItemsSummaryData.length + 1;
+        obj.holder_name = item.customer_invoices.customers_data.customer_name;
+        obj.item_name = item.items_data.item_name;
+        obj.date = item.customer_invoices.customer_invoice_date;
+        obj.balance = 0;
+        obj.item_in = 0;
+        obj.item_out =
+          item.customer_invoice_item_size * item.customer_invoice_item_quantity;
+        ItemsSummaryData.push(obj);
+      });
+
+      suppliersDetailsInvoices.map((item) => {
+        let obj: any = {};
+        obj.invoice_id = item.supplier_invoice_id;
+        obj.rowKey = ItemsSummaryData.length + 1;
+        obj.holder_name = item.supplier_invoices.suppliers_data.supplier_name;
+        obj.item_name = item.items_data.item_name;
+        obj.date = item.supplier_invoices.supplier_invoice_date;
+        obj.balance = 0;
+        obj.item_out = 0;
+        obj.item_in =
+          item.supplier_invoice_item_size * item.supplier_invoice_item_quantity;
+        ItemsSummaryData.push(obj);
+      });
+
+      ItemsSummaryData.sort(function (a: string, b: string) {
+        //@ts-ignore
+        return b.date - a.date;
+      });
+
+      let balance = 0;
+      ItemsSummaryData.forEach((element) => {
+        balance = element.item_in - element.item_out + balance;
+        element.balance = balance;
+        element.date = element.date.toJSON().slice(0, 10);
+      });
+
+      return { data: ItemsSummaryData };
+    } else {
+      return { data: [] };
+    }
+  }
+
+  async getDailySummary(Params: { date_from: string; date_to: string }) {
+    if (
+      Params.date_from &&
+      Params.date_to &&
+      Params.date_from !== '' &&
+      Params.date_to !== ''
+    ) {
+      let dailyResponse: any = [];
+      const customersInvoices = await this.prisma.customer_invoices.findMany({
+        where: {
+          customer_invoice_date: {
+            gte: new Date(Params.date_from),
+            lte: new Date(Params.date_to),
+          },
+        },
+        include: {
+          customers_data: {
+            select: {
+              customer_name: true,
+            },
+          },
+        },
+      });
+
+      customersInvoices.map((item) => {
+        let obj: any = {};
+        obj.rowKey = dailyResponse.length + 1;
+        obj.holder_name = item.customers_data.customer_name;
+        obj.type = 'invoice/فاتورة';
+        obj.record_id = item.customer_invoice_id;
+        obj.credit = 0;
+        obj.total = 0;
+        obj.debit = +item.customer_invoice_paid;
+        obj.date = item.customer_invoice_date;
+        dailyResponse.push(obj);
+      });
+
+      const supplierInvoices = await this.prisma.supplier_invoices.findMany({
+        where: {
+          supplier_invoice_date: {
+            gte: new Date(Params.date_from),
+            lte: new Date(Params.date_to),
+          },
+        },
+        include: {
+          suppliers_data: {
+            select: {
+              supplier_name: true,
+            },
+          },
+        },
+      });
+
+      supplierInvoices.map((item) => {
+        let obj: any = {};
+        obj.rowKey = dailyResponse.length + 1;
+        obj.holder_name = item.suppliers_data.supplier_name;
+        obj.type = 'invoice/فاتورة';
+        obj.record_id = item.supplier_invoice_id;
+        obj.debit = 0;
+        obj.total = 0;
+        obj.credit = +item.supplier_invoice_paid;
+        obj.date = item.supplier_invoice_date;
+        dailyResponse.push(obj);
+      });
+
+      const paymentVoucher = await this.prisma.cash_payment_voucher.findMany({
+        where: {
+          voucher_date: {
+            gte: new Date(Params.date_from),
+            lte: new Date(Params.date_to),
+          },
+        },
+        include: {
+          suppliers_data: {
+            select: {
+              supplier_name: true,
+            },
+          },
+          customers_data: {
+            select: {
+              customer_name: true,
+            },
+          },
+        },
+      });
+
+      paymentVoucher.map((item) => {
+        let obj: any = {};
+        obj.rowKey = dailyResponse.length + 1;
+        obj.holder_name =
+          item.suppliers_data === null
+            ? item.customers_data.customer_name
+            : item.suppliers_data.supplier_name;
+        obj.type = 'voucher / سند';
+        obj.record_id = item.payment_voucher_id;
+        obj.debit = item.suppliers_data === null ? +item.voucher_amount : 0;
+        obj.credit = item.customers_data === null ? +item.voucher_amount : 0;
+        obj.total = 0;
+        obj.date = item.voucher_date;
+        dailyResponse.push(obj);
+      });
+
+      const receiptVoucher = await this.prisma.cash_receipt_voucher.findMany({
+        where: {
+          voucher_date: {
+            gte: new Date(Params.date_from),
+            lte: new Date(Params.date_to),
+          },
+        },
+        include: {
+          suppliers_data: {
+            select: {
+              supplier_name: true,
+            },
+          },
+          customers_data: {
+            select: {
+              customer_name: true,
+            },
+          },
+        },
+      });
+
+      receiptVoucher.map((item) => {
+        let obj: any = {};
+        obj.rowKey = dailyResponse.length + 1;
+        obj.holder_name =
+          item.suppliers_data === null
+            ? item.customers_data.customer_name
+            : item.customers_data === null
+            ? item.suppliers_data.supplier_name
+            : '';
+        obj.type = 'voucher / سند';
+        obj.record_id = item.receipt_voucher_id;
+        obj.credit = item.suppliers_data === null ? +item.voucher_amount : 0;
+        obj.debit = item.customers_data === null ? +item.voucher_amount : 0;
+        obj.total = 0;
+        obj.date = item.voucher_date;
+        dailyResponse.push(obj);
+      });
+
+      dailyResponse.sort(function (a: string, b: string) {
+        //@ts-ignore
+        return b.date - a.date;
+      });
+
+      let total = 0;
+      dailyResponse.forEach((element) => {
+        total = element.debit - element.credit + total;
+        element.total = total;
+        element.date = element.date.toJSON().slice(0, 10);
+      });
+
+      return {
+        data: dailyResponse,
+      };
+    } else {
+      return { data: [] };
+    }
+  }
 }

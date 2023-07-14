@@ -16,4 +16,14 @@ export class SystemReportsController {
   getSuppliersSummary(@Query() Params: { supplier_id: string }) {
     return this.SystemReportsService.getSuppliersSummary(Params);
   }
+
+  @Get('items_summary_table')
+  getItemsSummary(@Query() Params: { item_id: string }) {
+    return this.SystemReportsService.getItemsSummary(Params);
+  }
+
+  @Get('daily_summary_table')
+  getDailySummary(@Query() Params: { date_from: string; date_to: string }) {
+    return this.SystemReportsService.getDailySummary(Params);
+  }
 }

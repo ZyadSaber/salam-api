@@ -52,7 +52,7 @@ export class CasherPaymentVoucherService {
         } else {
           //@ts-ignore
           voucher.voucher_type = 'O';
-          voucherName = 'other';
+          voucherName = 'Expense';
         }
 
         //@ts-ignore
@@ -100,7 +100,7 @@ export class CasherPaymentVoucherService {
         } else {
           //@ts-ignore
           voucher.voucher_type = 'O';
-          voucherName = 'other';
+          voucherName = 'Expense';
         }
 
         //@ts-ignore
@@ -146,7 +146,7 @@ export class CasherPaymentVoucherService {
         } else {
           //@ts-ignore
           voucher.voucher_type = 'O';
-          voucherName = 'other';
+          voucherName = 'Expense';
         }
 
         //@ts-ignore
@@ -185,7 +185,7 @@ export class CasherPaymentVoucherService {
         } else {
           //@ts-ignore
           voucher.voucher_type = 'O';
-          voucherName = 'other';
+          voucherName = 'Expense';
         }
 
         //@ts-ignore
@@ -221,7 +221,7 @@ export class CasherPaymentVoucherService {
       } catch (error) {
         throw error;
       }
-    } else if (dto.voucher_type) {
+    } else if (dto.voucher_type === 'S') {
       try {
         await this.prisma.cash_payment_voucher.create({
           data: {
@@ -237,13 +237,14 @@ export class CasherPaymentVoucherService {
       } catch (error) {
         throw error;
       }
-    } else {
+    } else if (dto.voucher_type === 'O') {
       try {
         await this.prisma.cash_payment_voucher.create({
           data: {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
             notes: dto.notes,
+            expense_type_id: dto.voucher_id,
           },
         });
         return {

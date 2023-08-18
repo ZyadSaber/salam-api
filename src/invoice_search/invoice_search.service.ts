@@ -25,6 +25,21 @@ export class InvoiceSearchService {
       return this.CustomersService.getCustomersList();
     } else if (params.invoice_type === 'S') {
       return this.SuppliersService.getSuppliersList();
+    } else if (params.invoice_type === 'O') {
+      let expenseList: any = [];
+      const expenseData = await this.prisma.expense_types.findMany({
+        select: {
+          expense_type_id: true,
+          expense_type_name: true,
+        },
+      });
+      expenseData.map((item) => {
+        let obj: any = {};
+        obj.value = item.expense_type_id;
+        obj.label = item.expense_type_name;
+        expenseList.push(obj);
+      });
+      return expenseList;
     } else {
       return [];
     }

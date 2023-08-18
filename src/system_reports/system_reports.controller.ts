@@ -26,4 +26,11 @@ export class SystemReportsController {
   getDailySummary(@Query() Params: { date_from: string; date_to: string }) {
     return this.SystemReportsService.getDailySummary(Params);
   }
+
+  @Get('accounts_summary_table')
+  getAccountsSummary(
+    @Query() Params: { date_from: string; date_to: string; type: string },
+  ) {
+    return this.SystemReportsService.getAccountsSummary(Params);
+  }
 }

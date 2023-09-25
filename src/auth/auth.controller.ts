@@ -6,6 +6,7 @@ import {
   Delete,
   Get,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { singUpType } from '../types';
@@ -40,5 +41,11 @@ export class AuthController {
   @Get('users_info')
   appPages() {
     return this.authService.getUsers();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('salam_pages')
+  salamPages(@Query() params: { user_name: string }) {
+    return this.authService.getUserPage(params);
   }
 }

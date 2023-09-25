@@ -19,24 +19,21 @@ model users {
   user_name     String @unique
   password_hash String
 
-  first_name String
-  last_name  String?
-
-  user_role_id Int?
-  user_role    user_role? @relation(fields: [user_role_id], references: [user_role_id])
+  first_name       String
+  last_name        String?
+  user_permissions user_permissions[]
 }
 
-model user_role {
-  user_role_id Int      @id @default(autoincrement())
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+model page_parent {
+  page_parent_id Int      @id @default(autoincrement())
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
-  user_role_name String @unique()
-  user_access    String @default("N") @db.VarChar(1)
+  page_parent_name String @unique()
+  hidden           String @default("N") @db.VarChar(1)
 
-  page_id   Int
-  app_pages app_pages? @relation(fields: [page_id], references: [page_id])
-  users     users[]
+  app_pages app_pages[]
+  // user_permissions user_permissions[]
 }
 
 model app_pages {
@@ -44,13 +41,31 @@ model app_pages {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  page_parent_id Int?
+
   page_name     String  @unique()
   page_link     String  @unique()
   page_disabled String? @default("N") @db.VarChar(1)
   run_in_modal  String? @default("N") @db.VarChar(1)
 
-  parent_name String?     @default("")
-  user_role   user_role[]
+  page_parent      page_parent?       @relation(fields: [page_parent_id], references: [page_parent_id])
+  user_permissions user_permissions[]
+}
+
+model user_permissions {
+  user_permissions_id Int      @id @default(autoincrement())
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  // page_parent_id Int
+  user_id Int
+  page_id Int @unique()
+
+  status Boolean @default(false)
+
+  app_pages app_pages? @relation(fields: [page_id], references: [page_id])
+  // page_parent page_parent? @relation(fields: [page_parent_id], references: [page_parent_id])
+  users     users?     @relation(fields: [user_id], references: [id])
 }
 
 model language_code {

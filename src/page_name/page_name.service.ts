@@ -36,7 +36,7 @@ export class PageNameService {
             page_link: dto.page_link,
             page_disabled: dto.page_disabled,
             run_in_modal: dto.run_in_modal,
-            parent_name: dto.parent_name,
+            // parent_name: dto.parent_name,
           },
         });
         return {
@@ -70,7 +70,7 @@ export class PageNameService {
           page_link: dto.page_link,
           page_disabled: dto.page_disabled,
           run_in_modal: dto.run_in_modal,
-          parent_name: dto.parent_name,
+          // parent_name: dto.parent_name,
         },
       });
       return { response: 'success' };

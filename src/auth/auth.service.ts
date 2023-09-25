@@ -74,6 +74,7 @@ export class AuthService {
     build_name?: string;
     role?: string;
     app_name?: string;
+    user_name?: string;
   }> {
     const payLoad = {
       sub: userId,
@@ -94,6 +95,7 @@ export class AuthService {
       build_name: 'build 1.3.1',
       role: 'admin',
       app_name: this.config.get('APP_NAME'),
+      user_name: user_name,
     };
   }
 
@@ -103,5 +105,70 @@ export class AuthService {
       delete user.password_hash;
     });
     return { data: users };
+  }
+
+  async getUserPage(dto: { user_name: string }) {
+    const data = await this.prisma.user_permissions.findMany({
+      where: {
+        users: {
+          user_name: dto.user_name,
+        },
+        app_pages: {
+          page_disabled: 'N',
+        },
+        status: true,
+      },
+      select: {
+        app_pages: {
+          select: {
+            page_id: true,
+            page_name: true,
+            page_link: true,
+            page_disabled: true,
+            run_in_modal: true,
+            page_parent: {
+              select: {
+                page_parent_id: true,
+                page_parent_name: true,
+                hidden: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let pageParent = [];
+
+    data.map((e) => {
+      pageParent.push({
+        page_parent_id: e.app_pages.page_parent.page_parent_id,
+        page_parent_name: e.app_pages.page_parent.page_parent_name,
+        app_pages: [],
+      });
+    });
+
+    pageParent = pageParent.filter((obj, index) => {
+      return (
+        index ===
+        pageParent.findIndex((o) => obj.page_parent_id === o.page_parent_id)
+      );
+    });
+
+    pageParent.map((e, index) => {
+      data.map((p) => {
+        if (p.app_pages.page_parent.page_parent_id === e.page_parent_id) {
+          pageParent[index].app_pages.push({
+            page_disabled: p.app_pages.page_disabled,
+            page_name: p.app_pages.page_name,
+            page_link: p.app_pages.page_link,
+            run_in_modal: p.app_pages.run_in_modal,
+            page_id: p.app_pages.page_id,
+          });
+        }
+      });
+    });
+
+    return pageParent;
   }
 }

@@ -53,15 +53,12 @@ model app_pages {
 }
 
 model user_permissions {
-  user_permissions_id Int      @id @default(autoincrement())
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  user_permissions_id Int @id @default(autoincrement())
 
   // page_parent_id Int
   user_id Int
-  page_id Int @unique()
-
-  status Boolean @default(false)
+  page_id Int
+  status  Boolean @default(false)
 
   app_pages app_pages? @relation(fields: [page_id], references: [page_id])
   // page_parent page_parent? @relation(fields: [page_parent_id], references: [page_parent_id])

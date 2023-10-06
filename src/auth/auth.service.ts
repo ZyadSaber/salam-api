@@ -110,13 +110,19 @@ export class AuthService {
   async getUserPage(dto: { user_name: string }) {
     const data = await this.prisma.user_permissions.findMany({
       where: {
-        users: {
-          user_name: dto.user_name,
-        },
-        app_pages: {
-          page_disabled: 'N',
-        },
-        status: true,
+        AND: [
+          {
+            users: {
+              user_name: dto.user_name,
+            },
+          },
+          {
+            app_pages: {
+              page_disabled: 'N',
+            },
+          },
+          { status: true },
+        ],
       },
       select: {
         app_pages: {
@@ -155,13 +161,15 @@ export class AuthService {
       );
     });
 
+    pageParent.sort((a, b) => a.page_parent_id - b.page_parent_id);
+
     pageParent.map((e, index) => {
       data.map((p) => {
         if (p.app_pages.page_parent.page_parent_id === e.page_parent_id) {
           pageParent[index].app_pages.push({
             page_disabled: p.app_pages.page_disabled,
             page_name: p.app_pages.page_name,
-            page_link: p.app_pages.page_link,
+            page_link: `${p.app_pages.page_link}`,
             run_in_modal: p.app_pages.run_in_modal,
             page_id: p.app_pages.page_id,
           });
@@ -170,5 +178,26 @@ export class AuthService {
     });
 
     return pageParent;
+  }
+
+  async updatePagesPermissions(dto) {
+    const computedPages = await dto.map((record) => {
+      record.status = record.status === 'Y' ? true : false;
+      delete record.page_name;
+      delete record.page_link;
+      return record;
+    });
+    const updatedData = await computedPages.map((record) => {
+      console.log(record);
+      this.prisma.user_permissions.update({
+        where: {
+          user_permissions_id: +record.user_permissions_id,
+        },
+        data: {
+          status: record.status,
+        },
+      });
+    });
+    return { response: 'success' };
   }
 }

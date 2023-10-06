@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { PageNameService } from './page_name.service';
@@ -19,6 +20,11 @@ export class PageNameController {
   @Get('page_name_table_data')
   getPageName() {
     return this.PageNameService.getPageNameMainTable();
+  }
+
+  @Get('page_name_list_to_view')
+  getLinkedPages(@Query() params: { user_id: number }) {
+    return this.PageNameService.getLinkedPages(params);
   }
 
   @Post('page_name_table_data_dml')

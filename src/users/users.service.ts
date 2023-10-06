@@ -8,11 +8,7 @@ export class UsersService {
 
   async getUsersData(dto: usersSearchParams) {
     try {
-      const users = await this.prisma.users.findMany({
-        where: {
-          // id: +dto.id,
-        },
-      });
+      const users = await this.prisma.users.findMany();
       users.map((user) => {
         delete user.password_hash;
       });

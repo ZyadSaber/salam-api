@@ -26,6 +26,7 @@ export class AuthController {
   createUser(@Body() dto: singUpType) {
     return this.authService.signup(dto);
   }
+
   @UseGuards(JwtGuard)
   @Put('users_info_dml')
   EditUser(@Body() dto: singUpType) {
@@ -47,5 +48,11 @@ export class AuthController {
   @Get('salam_pages')
   salamPages(@Query() params: { user_name: string }) {
     return this.authService.getUserPage(params);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('user_page_permissions')
+  updatePagesPermissions(@Body() dto: any) {
+    return this.authService.updatePagesPermissions(dto);
   }
 }

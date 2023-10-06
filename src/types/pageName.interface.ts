@@ -9,7 +9,7 @@ export class newPageName {
   page_link: string;
   page_disabled?: string;
   run_in_modal?: string;
-  parent_name?: string;
+  page_parent_id?: number;
 }
 
 export class editPageName {
@@ -24,7 +24,7 @@ export class editPageName {
   page_link: string;
   page_disabled?: string;
   run_in_modal?: string;
-  parent_name?: string;
+  page_parent_id?: string;
 }
 
 export class deletePageName {

@@ -22,6 +22,8 @@ import { CasherReceiptVoucherModule } from './casher_receipt_voucher/casher_rece
 import { CasherPaymentVoucherModule } from './casher_payment_voucher/casher_payment_voucher.module';
 import { PageNameModule } from './page_name/page_name.module';
 import { SystemReportsModule } from './system_reports/system_reports.module';
+import { ParentPagesModule } from './parent-pages/parent-pages.module';
+import { LabelsPageModule } from './labels-page/labels-page.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { SystemReportsModule } from './system_reports/system_reports.module';
     CasherPaymentVoucherModule,
     PageNameModule,
     SystemReportsModule,
+    ParentPagesModule,
+    LabelsPageModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

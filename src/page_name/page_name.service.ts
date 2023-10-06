@@ -7,10 +7,26 @@ export class PageNameService {
   constructor(private prisma: PrismaModuleService) {}
 
   async getPageNameMainTable() {
-    const pageNames = await this.prisma.app_pages.findMany();
+    const pageNames = await this.prisma.app_pages.findMany({
+      orderBy: {
+        page_id: 'asc',
+      },
+      include: {
+        page_parent: {
+          select: {
+            page_parent_name: true,
+          },
+        },
+      },
+    });
     pageNames.map((pageName) => {
       //@ts-ignore
       pageName.query_status = 'q';
+      //@ts-ignore
+      pageName.page_parent_name = pageName.page_parent
+        ? pageName.page_parent.page_parent_name
+        : '';
+      delete pageName.page_parent;
     });
     return {
       data: pageNames,
@@ -36,9 +52,31 @@ export class PageNameService {
             page_link: dto.page_link,
             page_disabled: dto.page_disabled,
             run_in_modal: dto.run_in_modal,
-            // parent_name: dto.parent_name,
+            page_parent_id: dto.page_parent_id,
           },
         });
+        // await this.prisma.$queryRaw`
+        //   do
+        //   $$
+        //   declare
+        //   f record;
+        //   begin
+        //   for f in select id
+        //     from users
+        //   loop
+        //   INSERT INTO user_permissions (
+        // 	  user_id,
+        //     page_id,
+        //     status
+        //   )VALUES(
+        //     f.id,
+        //     ${newPageName.page_id},
+        //     false
+        //   );
+        // end loop;
+        // end;
+        // $$;
+        // `;
         return {
           response: 'success',
           message: `Created Page Name ${newPageName.page_name}`,
@@ -70,7 +108,7 @@ export class PageNameService {
           page_link: dto.page_link,
           page_disabled: dto.page_disabled,
           run_in_modal: dto.run_in_modal,
-          // parent_name: dto.parent_name,
+          page_parent_id: +dto.page_parent_id,
         },
       });
       return { response: 'success' };
@@ -83,6 +121,11 @@ export class PageNameService {
   }
 
   async deletePageName(dto: deletePageName) {
+    await this.prisma.user_permissions.deleteMany({
+      where: {
+        page_id: +dto.page_id,
+      },
+    });
     const existCustomer = await this.prisma.app_pages.findUnique({
       where: {
         page_id: +dto.page_id,
@@ -101,5 +144,33 @@ export class PageNameService {
       response: 'error',
       message: 'This Page Name does not exist',
     });
+  }
+
+  async getLinkedPages(dto: { user_id: number }) {
+    const data = await this.prisma.user_permissions.findMany({
+      where: {
+        user_id: +dto.user_id,
+      },
+      include: {
+        app_pages: {
+          select: {
+            page_name: true,
+            page_link: true,
+          },
+        },
+      },
+    });
+
+    data.forEach((record) => {
+      //@ts-ignore
+      record.page_name = record.app_pages.page_name;
+      //@ts-ignore
+      record.page_link = record.app_pages.page_link;
+      //@ts-ignore
+      record.status = record.status ? 'Y' : 'N';
+      delete record.app_pages;
+    });
+
+    return data;
   }
 }

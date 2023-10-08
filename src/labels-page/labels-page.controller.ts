@@ -6,11 +6,10 @@ import {
   Post,
   Put,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { LabelsPageService } from './labels-page.service';
-// import { newPageName, editPageName, deletePageName } from '../types';
+import { newAndEditLabels, DeleteLabel } from '../types';
 
 @UseGuards(JwtGuard)
 @Controller('api/system_tools/labels')
@@ -18,22 +17,22 @@ export class LabelsPageController {
   constructor(private LabelsPageService: LabelsPageService) {}
 
   @Get('label_data_table')
-  getPageName() {
+  getLabels() {
     return this.LabelsPageService.getLabelMainTable();
   }
 
   @Post('label_data_table_dml')
-  postPageName(@Body() dto: any) {
+  postLabels(@Body() dto: newAndEditLabels) {
     return this.LabelsPageService.newLabel(dto);
   }
 
-  @Put('page_name_table_data_dml')
-  putPageName(@Body() dto: any) {
+  @Put('label_data_table_dml')
+  putLabels(@Body() dto: newAndEditLabels) {
     return this.LabelsPageService.editLabel(dto);
   }
 
-  @Delete('page_name_table_data_dml')
-  DeletePageName(@Body() dto: any) {
-    // return this.LabelsPageService.deletePageName(dto);
+  @Delete('label_data_table_dml')
+  DeleteLabels(@Body() dto: DeleteLabel) {
+    return this.LabelsPageService.deleteLabel(dto);
   }
 }

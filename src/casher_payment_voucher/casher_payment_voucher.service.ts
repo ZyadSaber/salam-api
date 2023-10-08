@@ -66,6 +66,8 @@ export class CasherPaymentVoucherService {
         voucher.voucher_name = voucherName;
         //@ts-ignore
         voucher.voucher_id = voucherId;
+         //@ts-ignore
+         voucher_amount = +voucher.voucher_amount;
         delete voucher.customer_id;
         delete voucher.supplier_id;
       });
@@ -114,6 +116,8 @@ export class CasherPaymentVoucherService {
         voucher.voucher_name = voucherName;
         //@ts-ignore
         voucher.voucher_id = voucherId;
+         //@ts-ignore
+         voucher.voucher_amount = +voucher.voucher_amount;
       });
       return { data: getRecords };
     } else if (params.date_to) {
@@ -160,6 +164,8 @@ export class CasherPaymentVoucherService {
         voucher.voucher_name = voucherName;
         //@ts-ignore
         voucher.voucher_id = voucherId;
+         //@ts-ignore
+         voucher.voucher_amount = +voucher.voucher_amount;
       });
     } else {
       const getRecords = await this.prisma.cash_payment_voucher.findMany();
@@ -199,6 +205,8 @@ export class CasherPaymentVoucherService {
         voucher.voucher_name = voucherName;
         //@ts-ignore
         voucher.voucher_id = voucherId;
+         //@ts-ignore
+         voucher.voucher_amount = +voucher.voucher_amount;
       });
       return { data: getRecords };
     }

@@ -36,6 +36,6 @@ export class InvoiceSearchController {
 
   @Get('supplier_invoices_for_today')
   getSupplierInvoicesToday() {
-    return this.InvoiceSearchService.getCustomersInvoicesToday();
+    return this.InvoiceSearchService.getSupplierInvoicesToday();
   }
 }

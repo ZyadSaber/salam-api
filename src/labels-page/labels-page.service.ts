@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
-import { newPageName, editPageName, deletePageName } from '../types';
+import { newAndEditLabels, DeleteLabel } from '../types';
 
 @Injectable()
 export class LabelsPageService {
@@ -16,7 +16,7 @@ export class LabelsPageService {
     return { data: labelData };
   }
 
-  async newLabel(dto) {
+  async newLabel(dto:newAndEditLabels) {
     const existLabel = await this.prisma.language_code.findMany({
       where: {
         language_code: dto.language_code,
@@ -33,7 +33,7 @@ export class LabelsPageService {
         });
         return {
           response: 'success',
-          message: `Created Page Name ${newLabel.language_code} @ ${newLabel.created_at}`,
+          message: `Created Label ${newLabel.language_code} @ ${newLabel.created_at}`,
         };
       } catch (error) {
         throw error;
@@ -46,7 +46,7 @@ export class LabelsPageService {
     }
   }
 
-  async editLabel(dto) {
+  async editLabel(dto: newAndEditLabels) {
     try {
       const updatedLabel = await this.prisma.language_code.update({
         where: {
@@ -59,10 +59,26 @@ export class LabelsPageService {
       });
       return {
         response: 'success',
-        message: `Created Page Name ${updatedLabel.language_code} @ ${updatedLabel.updated_at}`,
+        message: `Update Label ${updatedLabel.language_code} @ ${updatedLabel.updated_at}`,
       };
     } catch (error) {
       throw error;
+    }
+  }
+
+  async deleteLabel(dto: DeleteLabel){
+    try{
+      const deleteLabel = await this.prisma.language_code.delete({
+        where:{
+          language_code: dto.language_code
+        }
+      })
+      return {
+        response: 'success',
+        message: `Deleted Page Name ${deleteLabel.language_code}`,
+      };
+    }catch(error){
+      throw error
     }
   }
 }

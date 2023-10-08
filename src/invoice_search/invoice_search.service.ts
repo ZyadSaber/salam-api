@@ -231,7 +231,7 @@ export class InvoiceSearchService {
       },
     });
     const customerData = await this.CustomersService.getCustomersList();
-    invoices.map((invoice) => {
+    invoices.forEach((invoice) => {
       const filter = customerData.filter(
         (customer) => customer.value === invoice.customer_id,
       );
@@ -239,11 +239,34 @@ export class InvoiceSearchService {
       invoice.invoice_holder_name = filter[0].label;
       delete invoice.created_at;
       delete invoice.updated_at;
-      const date = new Date(invoice.customer_invoice_date);
+      delete invoice.customer_invoice_date;
+      return invoice;
+    });
+    return {
+      data: invoices,
+    };
+  }
+
+  async getSupplierInvoicesToday() {
+    const dateOfToday = new Date();
+    dateOfToday.setHours(0, 0, 0, 0);
+    const invoices = await this.prisma.supplier_invoices.findMany({
+      where: {
+        supplier_invoice_date: {
+          gte: dateOfToday,
+        },
+      },
+    });
+    const suppliersData = await this.SuppliersService.getSuppliersList();
+    invoices.forEach((invoice) => {
+      const filter = suppliersData.filter(
+        (supplier) => supplier.value === invoice.supplier_id,
+      );
       //@ts-ignore
-      invoice.customer_invoice_date = `${date.getFullYear()}-${
-        date.getMonth() + 1
-      }-${date.getDate()}`;
+      invoice.invoice_holder_name = filter[0].label;
+      delete invoice.created_at;
+      delete invoice.updated_at;
+      delete invoice.supplier_invoice_date;
       return invoice;
     });
     return {

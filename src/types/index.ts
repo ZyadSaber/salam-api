@@ -12,3 +12,5 @@ export * from './employeeData.interface';
 export * from './chasherReceiptVoucher.interface';
 export * from './casherPaymentVoucher.interface';
 export * from './pageName.interface';
+export * from './labelsPage.interface';
+export * from './pagesParent.interface';

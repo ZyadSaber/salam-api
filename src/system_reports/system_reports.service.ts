@@ -379,8 +379,8 @@ export class SystemReportsService {
         obj.rowKey = dailyResponse.length + 1;
         obj.holder_name =
           item.suppliers_data === null
-            ? item.customers_data.customer_name
-            : item.suppliers_data.supplier_name;
+            ? item.customers_data?.customer_name
+            : item.suppliers_data?.supplier_name;
         obj.type = 'voucher / سند';
         obj.record_id = item.payment_voucher_id;
         obj.debit = item.suppliers_data === null ? +item.voucher_amount : 0;

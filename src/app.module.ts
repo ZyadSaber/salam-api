@@ -24,6 +24,7 @@ import { PageNameModule } from './page_name/page_name.module';
 import { SystemReportsModule } from './system_reports/system_reports.module';
 import { ParentPagesModule } from './parent-pages/parent-pages.module';
 import { LabelsPageModule } from './labels-page/labels-page.module';
+import { PagesParentPageModule } from './pages_parent_page/pages_parent_page.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { LabelsPageModule } from './labels-page/labels-page.module';
     SystemReportsModule,
     ParentPagesModule,
     LabelsPageModule,
+    PagesParentPageModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

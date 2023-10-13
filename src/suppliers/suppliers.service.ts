@@ -89,23 +89,18 @@ export class SuppliersService {
   }
 
   async deleteSupplier(dto: deleteSupplier) {
-    const existSupplier = await this.prisma.suppliers_data.findUnique({
-      where: {
-        supplier_id: dto.supplier_id,
-      },
-    });
-    if (existSupplier) {
+    try{
       await this.prisma.suppliers_data.delete({
         where: {
           supplier_id: +dto.supplier_id,
         },
       });
       return { response: 'success' };
-    } else {
+    }catch(error){
+      throw new ForbiddenException({
+        response: 'error',
+        message: `${error}`,
+      });
     }
-    throw new ForbiddenException({
-      response: 'error',
-      message: 'This Supplier does not exist',
-    });
-  }
+    }
 }

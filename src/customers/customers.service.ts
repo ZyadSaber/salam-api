@@ -89,23 +89,18 @@ export class CustomersService {
   }
 
   async deleteCustomer(dto: deleteCustomer) {
-    const existCustomer = await this.prisma.customers_data.findUnique({
-      where: {
-        customer_id: dto.customer_id,
-      },
-    });
-    if (existCustomer) {
+    try{
       await this.prisma.customers_data.delete({
         where: {
           customer_id: +dto.customer_id,
         },
       });
       return { response: 'success' };
-    } else {
+    } catch(error){
+      throw new ForbiddenException({
+        response: 'error',
+        message: `${error}`,
+      });
     }
-    throw new ForbiddenException({
-      response: 'error',
-      message: 'This Customer does not exist',
-    });
   }
 }

@@ -140,6 +140,7 @@ model expense_types {
 
   expense_type_note    String?
   cash_payment_voucher cash_payment_voucher[]
+  cash_receipt_voucher cash_receipt_voucher[]
 }
 
 model item_inventory {
@@ -268,10 +269,12 @@ model cash_receipt_voucher {
   voucher_amount Decimal
   customer_id    Int?
   supplier_id    Int?
+  expense_type_id Int?
   notes          String?
 
   customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
   suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])
+  expense_types  expense_types?  @relation(fields: [expense_type_id], references: [expense_type_id])
 }
 
 model cash_payment_voucher {

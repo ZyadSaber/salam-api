@@ -6,16 +6,19 @@ import {
   Post,
   Put,
   UseGuards,
+  Res
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { CustomerInvoiceService } from './customer-invoice.service';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 import {
   newCustomerInvoice,
   //   editSupplierInvoice,
   //   deleteSupplierInvoice,
 } from '../types';
 
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('api/invoices/customer_invoice')
 export class CustomerInvoiceController {
   constructor(private customerInvoice: CustomerInvoiceService) {}

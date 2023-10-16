@@ -25,6 +25,7 @@ import { SystemReportsModule } from './system_reports/system_reports.module';
 import { ParentPagesModule } from './parent-pages/parent-pages.module';
 import { LabelsPageModule } from './labels-page/labels-page.module';
 import { PagesParentPageModule } from './pages_parent_page/pages_parent_page.module';
+import { SystemPdfGenerateModule } from './system-pdf-generate/system-pdf-generate.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PagesParentPageModule } from './pages_parent_page/pages_parent_page.mod
     ParentPagesModule,
     LabelsPageModule,
     PagesParentPageModule,
+    SystemPdfGenerateModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

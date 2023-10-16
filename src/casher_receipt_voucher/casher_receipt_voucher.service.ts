@@ -1,7 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
-import { CustomersService } from '../customers/customers.service';
-import { SuppliersService } from '../suppliers/suppliers.service';
 import {
   paramsType,
   newReceiptVoucher,
@@ -13,195 +11,94 @@ import {
 export class CasherReceiptVoucherService {
   constructor(
     private prisma: PrismaModuleService,
-    private CustomersService: CustomersService,
-    private SuppliersService: SuppliersService,
   ) {}
 
   async getMainTable(params: paramsType) {
     const calculatedDateFrom = new Date(params.date_from);
     calculatedDateFrom.setHours(0, 0, 0, 0);
 
-    if (params.date_from && params.date_to) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
-        where: {
-          voucher_date: {
-            gte: calculatedDateFrom,
-            lte: new Date(params.date_to),
-          },
+  const getRecords = await this.prisma.cash_receipt_voucher.findMany({
+    where: {
+      voucher_date: {
+        gte: params.date_from ? calculatedDateFrom : undefined,
+        lte: params.date_from ? new Date(params.date_to) : undefined,
+      },
+    },
+    select: {
+      voucher_date: true,
+      customers_data: {
+        select: {
+          customer_name: true,
+          customer_id: true
         },
-      });
-      const customersData = await this.CustomersService.getCustomersList();
-      const supplierData = await this.SuppliersService.getSuppliersList();
-      getRecords.map((voucher) => {
-        let voucherName: string;
-        let voucherId: number;
-        if (voucher.customer_id) {
-          voucherId = voucher.customer_id;
-          //@ts-ignore
-          voucher.voucher_type = 'C';
-          voucherName = customersData.filter(
-            (customer) => customer.value === voucher.customer_id,
-          )[0]?.label;
-        } else if (voucher.supplier_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'S';
-          voucherId = voucher.supplier_id;
-          voucherName = supplierData.filter(
-            (supplier) => supplier.value === voucher.supplier_id,
-          )[0]?.label;
-        } else {
-          //@ts-ignore
-          voucher.voucher_type = 'O';
-          voucherName = 'other';
-        }
-
-        //@ts-ignore
-        voucher.query_status = 'q';
-        const date = new Date(voucher.voucher_date);
-        //@ts-ignore
-        voucher.voucher_date = `${date.getFullYear()}-${
-          date.getMonth() + 1
-        }-${date.getDay()}`;
-        //@ts-ignore
-        voucher.voucher_name = voucherName;
-        //@ts-ignore
-        voucher.voucher_id = voucherId;
-        delete voucher.customer_id;
-        delete voucher.supplier_id;
-      });
-      return { data: getRecords };
-    } else if (params.date_from) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
-        where: {
-          voucher_date: {
-            gte: calculatedDateFrom,
-          },
+      },
+      suppliers_data: {
+        select: {
+          supplier_name: true,
+          supplier_id: true
         },
-      });
-      const customersData = await this.CustomersService.getCustomersList();
-      const supplierData = await this.SuppliersService.getSuppliersList();
-      getRecords.map((voucher) => {
-        let voucherName: string;
-        let voucherId: number;
-        if (voucher.customer_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'C';
-          voucherId = voucher.customer_id;
-          voucherName = customersData.filter(
-            (customer) => customer.value === voucher.customer_id,
-          )[0]?.label;
-        } else if (voucher.supplier_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'S';
-          voucherId = voucher.supplier_id;
-          voucherName = supplierData.filter(
-            (supplier) => supplier.value === voucher.supplier_id,
-          )[0]?.label;
-        } else {
-          //@ts-ignore
-          voucher.voucher_type = 'O';
-          voucherName = 'other';
-        }
-
-        //@ts-ignore
-        voucher.query_status = 'q';
-        const date = new Date(voucher.voucher_date);
-        //@ts-ignore
-        voucher.voucher_date = `${date.getFullYear()}-${
-          date.getMonth() + 1
-        }-${date.getDay()}`;
-        //@ts-ignore
-        voucher.voucher_name = voucherName;
-        //@ts-ignore
-        voucher.voucher_id = voucherId;
-      });
-      return { data: getRecords };
-    } else if (params.date_to) {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany({
-        where: {
-          voucher_date: {
-            lte: new Date(params.date_to),
-          },
+      },
+      expense_types: {
+        select: {
+          expense_type_name: true,
+          expense_type_id: true
         },
-      });
-      const customersData = await this.CustomersService.getCustomersList();
-      const supplierData = await this.SuppliersService.getSuppliersList();
-      getRecords.map((voucher) => {
-        let voucherName: string;
-        let voucherId: number;
-        if (voucher.customer_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'C';
-          voucherId = voucher.customer_id;
-          voucherName = customersData.filter(
-            (customer) => customer.value === voucher.customer_id,
-          )[0]?.label;
-        } else if (voucher.supplier_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'S';
-          voucherId = voucher.supplier_id;
-          voucherName = supplierData.filter(
-            (supplier) => supplier.value === voucher.supplier_id,
-          )[0]?.label;
-        } else {
-          //@ts-ignore
-          voucher.voucher_type = 'O';
-          voucherName = 'other';
-        }
+      },
+      voucher_amount: true,
+      updated_at: true,
+      created_at: true,
+      receipt_voucher_id: true,
+      notes: true,
+    },
+  })
 
-        //@ts-ignore
-        voucher.query_status = 'q';
-        const date = new Date(voucher.voucher_date);
-        //@ts-ignore
-        voucher.voucher_date = `${date.getFullYear()}-${
-          date.getMonth() + 1
-        }-${date.getDay()}`;
-        //@ts-ignore
-        voucher.voucher_name = voucherName;
-        //@ts-ignore
-        voucher.voucher_id = voucherId;
-      });
-    } else {
-      const getRecords = await this.prisma.cash_receipt_voucher.findMany();
-      const customersData = await this.CustomersService.getCustomersList();
-      const supplierData = await this.SuppliersService.getSuppliersList();
-      getRecords.map((voucher) => {
-        let voucherName: string;
-        let voucherId: number;
-        if (voucher.customer_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'C';
-          voucherId = voucher.customer_id;
-          voucherName = customersData.filter(
-            (customer) => customer.value === voucher.customer_id,
-          )[0]?.label;
-        } else if (voucher.supplier_id) {
-          //@ts-ignore
-          voucher.voucher_type = 'S';
-          voucherId = voucher.supplier_id;
-          voucherName = supplierData.filter(
-            (supplier) => supplier.value === voucher.supplier_id,
-          )[0]?.label;
-        } else {
-          //@ts-ignore
-          voucher.voucher_type = 'O';
-          voucherName = 'other';
-        }
-
-        //@ts-ignore
-        voucher.query_status = 'q';
-        const date = new Date(voucher.voucher_date);
-        //@ts-ignore
-        voucher.voucher_date = `${date.getFullYear()}-${
-          date.getMonth() + 1
-        }-${date.getDay()}`;
-        //@ts-ignore
-        voucher.voucher_name = voucherName;
-        //@ts-ignore
-        voucher.voucher_id = voucherId;
-      });
-      return { data: getRecords };
+  getRecords.forEach((record) => {
+    //@ts-ignore
+    record.voucher_date = `${record.voucher_date.getFullYear()}-${
+      record.voucher_date.getMonth() + 1
+    }-${record.voucher_date.getDate()}`;
+    if (record.customers_data) {
+      //@ts-ignore
+      record.voucher_type_name = 'Customer';
+      //@ts-ignore
+      record.voucher_id = record.customers_data.customer_id;
+      //@ts-ignore
+      record.voucher_type = 'C';
+      //@ts-ignore
+      record.voucher_name = record.customers_data.customer_name;
+      delete record.customers_data;
+      delete record.suppliers_data;
+      delete record.expense_types;
+    } else if (record.suppliers_data) {
+      //@ts-ignore
+      record.voucher_type_name = 'Supplier';
+      //@ts-ignore
+      record.voucher_type = 'S';
+      //@ts-ignore
+      record.voucher_id = record.suppliers_data.supplier_id;
+      //@ts-ignore
+      record.voucher_name = record.suppliers_data.supplier_name;
+      delete record.customers_data;
+      delete record.suppliers_data;
+      delete record.expense_types;
+    } else if (record.expense_types) {
+      //@ts-ignore
+      record.voucher_name = record.expense_types.expense_type_name;
+      //@ts-ignore
+      record.voucher_type_name = 'Expense';
+      //@ts-ignore
+      record.voucher_id = record.expense_types.expense_type_id;
+      //@ts-ignore
+      record.voucher_type = 'O';
+      delete record.customers_data;
+      delete record.suppliers_data;
+      delete record.expense_types;
+      //@ts-ignore
+      record.query_status = 'q';
     }
+  });
+
+  return {data: getRecords}
   }
 
   async newReceiptVoucher(dto: newReceiptVoucher) {
@@ -221,7 +118,7 @@ export class CasherReceiptVoucherService {
       } catch (error) {
         throw error;
       }
-    } else if (dto.voucher_type) {
+    } else if (dto.voucher_type === "S") {
       try {
         await this.prisma.cash_receipt_voucher.create({
           data: {
@@ -244,6 +141,7 @@ export class CasherReceiptVoucherService {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
             notes: dto.notes,
+            expense_type_id: dto.voucher_id ? dto.voucher_id : null,
           },
         });
         return {
@@ -253,8 +151,6 @@ export class CasherReceiptVoucherService {
         throw error;
       }
     }
-
-    return { response: 'success' };
   }
 
   async editReceiptVoucher(dto: editReceiptVoucher) {
@@ -299,6 +195,7 @@ export class CasherReceiptVoucherService {
             voucher_date: new Date(dto.voucher_date),
             voucher_amount: +dto.voucher_amount,
             notes: dto.notes,
+            expense_type_id: dto.voucher_id ? dto.voucher_id : null,
           },
         });
         return { response: 'success' };

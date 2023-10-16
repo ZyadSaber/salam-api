@@ -1,7 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
-import { CustomersService } from '../customers/customers.service';
-import { SuppliersService } from '../suppliers/suppliers.service';
 import {
   newPaymentVoucher,
   editPaymentVoucher,
@@ -31,16 +29,19 @@ export class CasherPaymentVoucherService {
         customers_data: {
           select: {
             customer_name: true,
+            customer_id: true
           },
         },
         suppliers_data: {
           select: {
             supplier_name: true,
+            supplier_id: true
           },
         },
         expense_types: {
           select: {
             expense_type_name: true,
+            expense_type_id: true
           },
         },
         voucher_amount: true,
@@ -57,7 +58,11 @@ export class CasherPaymentVoucherService {
       }-${record.voucher_date.getDate()}`;
       if (record.customers_data) {
         //@ts-ignore
-        record.voucher_type = 'Customer';
+        record.voucher_type_name = 'Customer';
+        //@ts-ignore
+        record.voucher_id = record.customers_data.customer_id;
+        //@ts-ignore
+        record.voucher_type = 'C';
         //@ts-ignore
         record.voucher_name = record.customers_data.customer_name;
         delete record.customers_data;
@@ -65,7 +70,11 @@ export class CasherPaymentVoucherService {
         delete record.expense_types;
       } else if (record.suppliers_data) {
         //@ts-ignore
-        record.voucher_type = 'Supplier';
+        record.voucher_type_name = 'Supplier';
+        //@ts-ignore
+        record.voucher_type = 'S';
+        //@ts-ignore
+        record.voucher_id = record.suppliers_data.supplier_id;
         //@ts-ignore
         record.voucher_name = record.suppliers_data.supplier_name;
         delete record.customers_data;
@@ -75,7 +84,11 @@ export class CasherPaymentVoucherService {
         //@ts-ignore
         record.voucher_name = record.expense_types.expense_type_name;
         //@ts-ignore
-        record.voucher_type = 'Expense';
+        record.voucher_type_name = 'Expense';
+        //@ts-ignore
+        record.voucher_id = record.expense_types.expense_type_id;
+        //@ts-ignore
+        record.voucher_type = 'O';
         delete record.customers_data;
         delete record.suppliers_data;
         delete record.expense_types;

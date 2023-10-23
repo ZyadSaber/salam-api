@@ -144,6 +144,8 @@ export class InvoiceSearchService {
           customer_invoice_item_price: true,
           customer_invoice_item_total: true,
           customer_invoice_item_notes: true,
+          customer_invoice_item_id: true,
+          customer_invoice_print_option_id: true
         },
       });
       data.forEach((invoice) => {
@@ -172,6 +174,12 @@ export class InvoiceSearchService {
         //@ts-ignore
         invoice.notes = invoice.customer_invoice_item_notes;
         delete invoice.customer_invoice_item_notes;
+        //@ts-ignore
+        invoice.invoice_item_id = invoice.customer_invoice_item_id;
+        delete invoice.customer_invoice_item_id;
+        //@ts-ignore
+        invoice.invoice_print_option_id = invoice.customer_invoice_print_option_id;
+        delete invoice.customer_invoice_print_option_id;
         return invoice;
       });
       return { data: data };

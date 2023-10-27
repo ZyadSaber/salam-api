@@ -10,7 +10,7 @@ export class newPagesParentName {
 }
 
 export class updatedPagesParentName {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   page_parent_id: string;
   @IsString()

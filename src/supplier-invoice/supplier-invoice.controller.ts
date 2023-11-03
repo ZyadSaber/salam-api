@@ -12,7 +12,7 @@ import { SupplierInvoiceService } from './supplier-invoice.service';
 import {
   newSupplierInvoice,
 //   editSupplierInvoice,
-//   deleteSupplierInvoice,
+deleteSupplierInvoice,
 } from '../types';
 
 @UseGuards(JwtGuard)
@@ -21,7 +21,12 @@ export class SupplierInvoiceController {
   constructor(private supplierInvoice: SupplierInvoiceService) {}
 
   @Post('new_supplier_invoice')
-  postCustomers(@Body() dto: newSupplierInvoice) {
+  postSuppliers(@Body() dto: newSupplierInvoice) {
     return this.supplierInvoice.new_supplier_invoice(dto);
+  }
+
+  @Delete('supplier_invoice_dml')
+  deleteSupplierInvoice(@Body() dto:deleteSupplierInvoice){
+    return this.supplierInvoice.delete_main_invoice(dto)
   }
 }

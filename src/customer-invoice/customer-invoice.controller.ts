@@ -15,7 +15,7 @@ import { join } from 'path';
 import {
   newCustomerInvoice,
   //   editSupplierInvoice,
-  //   deleteSupplierInvoice,
+  deleteCustomerInvoice,
 } from '../types';
 
 // @UseGuards(JwtGuard)
@@ -27,4 +27,10 @@ export class CustomerInvoiceController {
   postCustomers(@Body() dto: newCustomerInvoice) {
     return this.customerInvoice.new_customer_invoice(dto);
   }
+
+  @Delete('customer_invoice_dml')
+    deleteCustomerInvoice(@Body() dto:deleteCustomerInvoice){
+      return this.customerInvoice.delete_main_invoice(dto)
+    }
+  
 }

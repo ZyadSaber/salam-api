@@ -3,7 +3,7 @@ import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newSupplierInvoice,
   //   editSupplierInvoice,
-  //   deleteSupplierInvoice,
+    deleteSupplierInvoice,
 } from '../types';
 
 @Injectable()
@@ -45,4 +45,25 @@ export class SupplierInvoiceService {
     }
     return { response: 'success', message: 'created new invoice' };
   }
+
+  async delete_main_invoice(dto:deleteSupplierInvoice){
+    try{
+     await this.prisma.supplier_invoices_items_details.deleteMany({
+       where:{
+         supplier_invoice_id: dto.invoice_id
+       }
+     })
+     await this.prisma.supplier_invoices.delete({
+       where:{
+         supplier_invoice_id: dto.invoice_id
+       }
+     })
+     return { response: 'success', message: 'This Invoice is deleted' };
+    } catch(error){
+     throw new ForbiddenException({
+       response: 'error',
+       message: error,
+     });
+    }
+   }
 }

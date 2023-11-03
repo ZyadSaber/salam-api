@@ -3,7 +3,7 @@ import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newCustomerInvoice,
   //   editCustomerInvoice,
-  //   deleteCustomerInvoice,
+    deleteCustomerInvoice,
 } from '../types';
 
 @Injectable()
@@ -11,17 +11,6 @@ export class CustomerInvoiceService {
   constructor(private prisma: PrismaModuleService) {}
 
   async new_customer_invoice(dto: newCustomerInvoice) {
-    const existCustomer = await this.prisma.customers_data.findMany({
-      where: {
-        customer_id: 1,
-      },
-    });
-    if (existCustomer.length === 0) {
-      throw new ForbiddenException({
-        response: 'error',
-        message: 'This Customer does not exist',
-      });
-    } else {
       const newInvoice = await this.prisma.customer_invoices.create({
         data: {
           customer_id: dto.customer_id,
@@ -44,7 +33,27 @@ export class CustomerInvoiceService {
       await this.prisma.customer_invoices_items_details.createMany({
         data: computedItemsArray,
       });
-    }
     return { response: 'success', message: 'created new invoice' };
+  }
+
+  async delete_main_invoice(dto:deleteCustomerInvoice){
+   try{
+    await this.prisma.customer_invoices_items_details.deleteMany({
+      where:{
+        customer_invoice_id: dto.invoice_id
+      }
+    })
+    await this.prisma.customer_invoices.delete({
+      where:{
+        customer_invoice_id: dto.invoice_id
+      }
+    })
+    return { response: 'success', message: 'This Invoice is deleted' };
+   } catch(error){
+    throw new ForbiddenException({
+      response: 'error',
+      message: error,
+    });
+   }
   }
 }

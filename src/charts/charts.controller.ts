@@ -11,4 +11,8 @@ export class ChartsController {
   getInvoicesData() {
     return this.ChartsService.getInvoicesChartData();
   }
+  @Get('vault_query_data')
+  getVaultData() {
+    return this.ChartsService.getVaultChartData();
+  }
 }

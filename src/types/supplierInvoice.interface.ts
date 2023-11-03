@@ -64,3 +64,8 @@ export class newSupplierInvoice {
   @Type(() => supplierInvoiceItemsType)
   supplier_invoice_items: supplierInvoiceItemsType[];
 }
+
+export class deleteSupplierInvoice {
+  @IsNotEmpty()
+invoice_id: number
+}

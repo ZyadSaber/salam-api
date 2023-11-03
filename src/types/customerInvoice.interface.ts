@@ -68,3 +68,8 @@ export class newCustomerInvoice {
   @Type(() => customerInvoiceItemsType)
   customer_invoice_items: customerInvoiceItemsType[];
 }
+
+export class deleteCustomerInvoice {
+    @IsNotEmpty()
+  invoice_id: number
+}

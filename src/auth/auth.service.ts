@@ -92,7 +92,7 @@ export class AuthService {
       response: 'success',
       authorization: token,
       display_name: first_name,
-      build_name: 'build 1.3.1',
+      build_name: this.config.get('BUILD_NUMBER'),
       role: 'admin',
       app_name: this.config.get('APP_NAME'),
       user_name: user_name,

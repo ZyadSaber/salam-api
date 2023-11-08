@@ -251,7 +251,7 @@ export class SystemReportsService {
         obj.balance = 0;
         obj.item_in = 0;
         obj.item_out =
-          item.customer_invoice_item_size * item.customer_invoice_item_quantity;
+          +item.customer_invoice_item_size * +item.customer_invoice_item_quantity;
         ItemsSummaryData.push(obj);
       });
 
@@ -265,7 +265,7 @@ export class SystemReportsService {
         obj.balance = 0;
         obj.item_out = 0;
         obj.item_in =
-          item.supplier_invoice_item_size * item.supplier_invoice_item_quantity;
+          +item.supplier_invoice_item_size * +item.supplier_invoice_item_quantity;
         ItemsSummaryData.push(obj);
       });
 

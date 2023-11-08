@@ -183,12 +183,12 @@ model supplier_invoices_items_details {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  supplier_invoice_item_width    Int
-  supplier_invoice_item_height   Int
-  supplier_invoice_item_size     Int
-  supplier_invoice_item_quantity Int
-  supplier_invoice_item_price    Int
-  supplier_invoice_item_total    Int
+  supplier_invoice_item_width    Decimal
+  supplier_invoice_item_height   Decimal
+  supplier_invoice_item_size     Decimal
+  supplier_invoice_item_quantity Decimal
+  supplier_invoice_item_price    Decimal
+  supplier_invoice_item_total    Decimal
   supplier_invoice_item_notes    String?
 
   supplier_invoice_item_id Int
@@ -227,12 +227,12 @@ model customer_invoices_items_details {
 
   customer_invoice_print_option_id Int
   customer_invoice_item_id         Int
-  customer_invoice_item_width      Int
-  customer_invoice_item_height     Int
-  customer_invoice_item_size       Int
-  customer_invoice_item_quantity   Int
-  customer_invoice_item_price      Int
-  customer_invoice_item_total      Int
+  customer_invoice_item_width      Decimal
+  customer_invoice_item_height     Decimal
+  customer_invoice_item_size       Decimal
+  customer_invoice_item_quantity   Decimal
+  customer_invoice_item_price      Decimal
+  customer_invoice_item_total      Decimal
 
   customer_invoice_item_notes String?
 

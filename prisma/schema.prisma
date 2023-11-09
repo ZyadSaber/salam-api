@@ -207,10 +207,11 @@ model customer_invoices {
   customer_invoice_date DateTime
 
   customer_invoice_total          Decimal
-  customer_invoice_discount       Decimal
-  customer_invoice_after_discount Decimal
-  customer_invoice_paid           Decimal
-  customer_invoice_credit         Decimal
+  customer_invoice_design_fee     Decimal @default(0)
+  customer_invoice_discount       Decimal  @default(0)
+  customer_invoice_after_discount Decimal 
+  customer_invoice_paid           Decimal @default(0)
+  customer_invoice_credit         Decimal @default(0)
   invoice_note                    String?
 
   customer_invoices_items_details customer_invoices_items_details[]
@@ -266,11 +267,11 @@ model cash_receipt_voucher {
 
   voucher_date DateTime @default(now())
 
-  voucher_amount Decimal
-  customer_id    Int?
-  supplier_id    Int?
+  voucher_amount  Decimal
+  customer_id     Int?
+  supplier_id     Int?
   expense_type_id Int?
-  notes          String?
+  notes           String?
 
   customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
   suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])

@@ -51,6 +51,9 @@ export class newCustomerInvoice {
   customer_invoice_total: number;
   @IsNotEmpty()
   @IsNumber()
+  customer_invoice_design_fee: number;
+  @IsNotEmpty()
+  @IsNumber()
   customer_invoice_discount: number;
   @IsNotEmpty()
   @IsNumber()

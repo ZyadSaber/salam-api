@@ -16,6 +16,7 @@ export class CustomerInvoiceService {
           customer_id: dto.customer_id,
           customer_invoice_date: new Date(dto.customer_invoice_date),
           customer_invoice_total: dto.customer_invoice_total,
+          customer_invoice_design_fee: dto.customer_invoice_design_fee,
           customer_invoice_discount: dto.customer_invoice_discount,
           customer_invoice_after_discount: dto.customer_invoice_after_discount,
           customer_invoice_paid: dto.customer_invoice_paid,

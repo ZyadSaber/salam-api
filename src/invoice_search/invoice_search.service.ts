@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { add } from 'date-fns'
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   customerSupplierListParams,
@@ -7,6 +8,7 @@ import {
 } from '../types';
 import { CustomersService } from '../customers/customers.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
+import { customerMainInvoice } from './invoice_search.interface';
 
 @Injectable()
 export class InvoiceSearchService {
@@ -42,11 +44,27 @@ export class InvoiceSearchService {
   }
 
   async customerSupplierMain(params: customerSupplierMainTableParams) {
+    const calculatedDateFrom = add(new Date(params.date_from), {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      })
+      const calculatedDateTo = add(new Date(params.date_to), {
+        hours: 23,
+        minutes: 59,
+        seconds: 59
+      })
     if (params.invoice_type === 'C') {
       const invoices = await this.prisma.customer_invoices.findMany({
         where: {
-          customer_invoice_id: +params.invoice_no || undefined,
+          // customer_invoice_id:{
+          //   in:  +params.invoice_no || undefined
+          // },
           customer_id: +params.holder_number || undefined,
+          customer_invoice_date: {
+            gte: params.date_from ? calculatedDateFrom : undefined,
+            lte: params.date_from ? calculatedDateTo : undefined,
+          },
         },
         select: {
           customers_data: {
@@ -56,33 +74,52 @@ export class InvoiceSearchService {
           },
           customer_invoice_id: true,
           customer_invoice_date: true,
+          customer_invoice_total: true,
+          customer_invoice_discount: true,
           customer_invoice_after_discount: true,
+          customer_invoice_credit: true,
+          customer_invoice_paid: true
         },
       });
-      invoices.forEach((invoice) => {
-        //@ts-ignore
-        invoice.invoice_type = params.invoice_type;
-        //@ts-ignore
-        invoice.holder_name = invoice.customers_data.customer_name;
-        //@ts-ignore
-        invoice.invoice_id = invoice.customer_invoice_id;
-        //@ts-ignore
-        invoice.invoice_date = `${invoice.customer_invoice_date.getFullYear()}-${
-          invoice.customer_invoice_date.getMonth() + 1
-        }-${invoice.customer_invoice_date.getDate()}`;
-        //@ts-ignore
-        invoice.invoice_total = invoice.customer_invoice_after_discount;
-        delete invoice.customer_invoice_after_discount;
-        delete invoice.customers_data;
-        delete invoice.customer_invoice_id;
-        delete invoice.customer_invoice_date;
+
+      const computedInvoices = invoices.map((record) => {
+        const computedRecord: customerMainInvoice = {
+          invoice_type: '',
+          holder_name: '',
+          invoice_id: 0,
+          invoice_date: '',
+          invoice_total_before_discount: undefined,
+          invoice_discount: undefined,
+          invoice_total_after_discount: undefined,
+          invoice_credit: undefined,
+          invoice_paid: undefined
+        };
+        computedRecord.invoice_type = params.invoice_type;
+        computedRecord.holder_name = record.customers_data.customer_name;
+        computedRecord.invoice_id = record.customer_invoice_id;
+        computedRecord.invoice_date = `${record.customer_invoice_date.getFullYear()}-${
+          record.customer_invoice_date.getMonth() + 1
+        }-${record.customer_invoice_date.getDate()}`;
+        computedRecord.invoice_total_before_discount =
+          record.customer_invoice_total;
+        computedRecord.invoice_discount = record.customer_invoice_discount;
+        computedRecord.invoice_total_after_discount =
+          record.customer_invoice_after_discount;
+          computedRecord.invoice_credit = record.customer_invoice_credit
+          computedRecord.invoice_paid = record.customer_invoice_paid
+        return computedRecord;
       });
-      return { data: invoices };
+
+      return { data: computedInvoices };
     } else if (params.invoice_type === 'S') {
       const invoices = await this.prisma.supplier_invoices.findMany({
         where: {
-          supplier_invoice_id: +params.invoice_no || undefined,
+          // supplier_invoice_id: +params.invoice_no || undefined,
           supplier_id: +params.holder_number || undefined,
+          supplier_invoice_date: {
+            gte: params.date_from ? calculatedDateFrom : undefined,
+            lte: params.date_from ? calculatedDateTo : undefined,
+          },
         },
         select: {
           suppliers_data: {
@@ -93,27 +130,41 @@ export class InvoiceSearchService {
           supplier_invoice_id: true,
           supplier_invoice_date: true,
           supplier_invoice_after_discount: true,
+          supplier_invoice_total: true,
+          supplier_invoice_discount: true,
+          supplier_invoice_credit: true,
+          supplier_invoice_paid: true,
         },
       });
-      invoices.forEach((invoice) => {
-        //@ts-ignore
-        invoice.invoice_type = params.invoice_type;
-        //@ts-ignore
-        invoice.holder_name = invoice.suppliers_data.supplier_name;
-        //@ts-ignore
-        invoice.invoice_id = invoice.supplier_invoice_id;
-        //@ts-ignore
-        invoice.invoice_date = `${invoice.supplier_invoice_date.getFullYear()}-${
-          invoice.supplier_invoice_date.getMonth() + 1
-        }-${invoice.supplier_invoice_date.getDate()}`;
-        //@ts-ignore
-        invoice.invoice_total = invoice.supplier_invoice_after_discount;
-        delete invoice.supplier_invoice_after_discount;
-        delete invoice.suppliers_data;
-        delete invoice.supplier_invoice_id;
-        delete invoice.supplier_invoice_date;
+      const computedInvoices = invoices.map((record) => {
+        const computedRecord: customerMainInvoice = {
+          invoice_type: '',
+          holder_name: '',
+          invoice_id: 0,
+          invoice_date: '',
+          invoice_total_before_discount: undefined,
+          invoice_discount: undefined,
+          invoice_total_after_discount: undefined,
+          invoice_credit: undefined,
+          invoice_paid: undefined
+        };
+        computedRecord.invoice_type = params.invoice_type;
+        computedRecord.holder_name = record.suppliers_data.supplier_name;
+        computedRecord.invoice_id = record.supplier_invoice_id;
+        computedRecord.invoice_date = `${record.supplier_invoice_date.getFullYear()}-${
+          record.supplier_invoice_date.getMonth() + 1
+        }-${record.supplier_invoice_date.getDate()}`;
+        computedRecord.invoice_total_before_discount =
+          record.supplier_invoice_total;
+        computedRecord.invoice_discount = record.supplier_invoice_discount;
+        computedRecord.invoice_total_after_discount =
+          record.supplier_invoice_after_discount;
+          computedRecord.invoice_credit = record.supplier_invoice_credit
+          computedRecord.invoice_paid = record.supplier_invoice_paid
+        return computedRecord;
       });
-      return { data: invoices };
+
+      return { data: computedInvoices };
     } else {
       return [];
     }
@@ -145,7 +196,7 @@ export class InvoiceSearchService {
           customer_invoice_item_total: true,
           customer_invoice_item_notes: true,
           customer_invoice_item_id: true,
-          customer_invoice_print_option_id: true
+          customer_invoice_print_option_id: true,
         },
       });
       data.forEach((invoice) => {
@@ -178,7 +229,8 @@ export class InvoiceSearchService {
         invoice.invoice_item_id = invoice.customer_invoice_item_id;
         delete invoice.customer_invoice_item_id;
         //@ts-ignore
-        invoice.invoice_print_option_id = invoice.customer_invoice_print_option_id;
+        invoice.invoice_print_option_id =
+          invoice.customer_invoice_print_option_id;
         delete invoice.customer_invoice_print_option_id;
         return invoice;
       });

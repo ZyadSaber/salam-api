@@ -33,6 +33,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cors": "^2.8.5",
+    "date-fns": "^2.30.0",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "pdf-lib": "^1.17.1",

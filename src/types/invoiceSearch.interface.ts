@@ -11,6 +11,8 @@ export class customerSupplierMainTableParams extends customerSupplierListParams 
   take?: number;
   skip?: number;
   holder_number?: number;
+  date_from?: string;
+  date_to?: string;
 }
 
 export class customerSupplierDetailTableParams extends customerSupplierListParams {

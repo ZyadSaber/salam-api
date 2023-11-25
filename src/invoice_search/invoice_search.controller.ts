@@ -7,7 +7,7 @@ import {
   customerSupplierDetailTableParams,
 } from '../types';
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('api/invoices/invoice_search')
 export class InvoiceSearchController {
   constructor(private InvoiceSearchService: InvoiceSearchService) {}

@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import { newItem, editItem, deleteItem } from '../types';
 
@@ -6,67 +7,72 @@ import { newItem, editItem, deleteItem } from '../types';
 export class ItemsService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getItemsMainTable() {
-    const items = await this.prisma.items_data.findMany();
-    items.map((item) => {
-      //@ts-ignore
-      item.query_status = 'q';
+  async getItemsMainTable(param?: any) {
+    const { item_name, item_unit, item_description } = param;
+    const items = await this.prisma.items_data.findMany({
+      where: {
+        item_name: {
+          contains: item_name || undefined,
+        },
+        item_unit: {
+          contains: item_unit || undefined,
+        },
+        item_description: {
+          contains: item_description || undefined,
+        },
+      },
+    });
+    const computedItems = items.map((item) => {
+      const obj = {
+        ...item,
+        created_at: format(item.created_at, 'yyyy-MM-dd hh:mm aa'),
+        updated_at: format(item.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q',
+      };
+      return obj;
     });
     return {
-      data: items,
+      data: computedItems,
     };
   }
 
   async getItemsList() {
     const items = await this.prisma.items_data.findMany();
-    const itemsList = [];
-    items.map((item) => {
-      const itemValue = {
+    const computedItems = items.map((item) => {
+      const obj = {
         label: item.item_name,
         value: item.item_id,
+        item_price: item.item_price,
       };
-      itemsList.push(itemValue);
+      return obj;
     });
-    return itemsList;
+    return computedItems;
   }
 
   async newItem(dto: newItem) {
-    const existItem = await this.prisma.items_data.findMany({
-      where: {
-        item_name: dto.item_name,
-      },
-    });
-    if (existItem.length === 0) {
-      try {
-        const newItem = await this.prisma.items_data.create({
-          data: {
-            item_name: dto.item_name,
-            item_unit: dto.item_unit,
-            item_description: dto.item_description,
-          },
-        });
-        return {
-          response: 'success',
-          message: `Created Item ${newItem.item_name}`,
-        };
-      } catch (error) {
-        throw error;
-      }
-    } else {
+    try {
+      const newItem = await this.prisma.items_data.create({
+        data: {
+          item_name: dto.item_name,
+          item_unit: dto.item_unit,
+          item_description: dto.item_description,
+          item_price: dto.item_price,
+        },
+      });
+      return {
+        response: 'success',
+        message: `Created Item ${newItem.item_name}`,
+      };
+    } catch (error) {
       throw new ForbiddenException({
         response: 'error',
-        message: 'This Item is exist',
+        message: error,
       });
     }
   }
 
   async putItem(dto: editItem) {
-    const existItem = await this.prisma.items_data.findUnique({
-      where: {
-        item_id: dto.item_id,
-      },
-    });
-    if (existItem) {
+    try {
       await this.prisma.items_data.update({
         where: {
           item_id: +dto.item_id,
@@ -75,35 +81,31 @@ export class ItemsService {
           item_name: dto.item_name,
           item_unit: dto.item_unit,
           item_description: dto.item_description,
+          item_price: dto.item_price,
         },
       });
       return { response: 'success' };
-    } else {
+    } catch (error) {
       throw new ForbiddenException({
         response: 'error',
-        message: 'This Item does not exist',
+        message: error,
       });
     }
   }
 
   async deleteItem(dto: deleteItem) {
-    const existItem = await this.prisma.items_data.findUnique({
-      where: {
-        item_id: dto.item_id,
-      },
-    });
-    if (existItem) {
+    try {
       await this.prisma.items_data.delete({
         where: {
           item_id: +dto.item_id,
         },
       });
       return { response: 'success' };
-    } else {
+    } catch (error) {
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
     }
-    throw new ForbiddenException({
-      response: 'error',
-      message: 'This Item does not exist',
-    });
   }
 }

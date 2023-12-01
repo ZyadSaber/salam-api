@@ -2,8 +2,8 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newCustomerInvoice,
-  //   editCustomerInvoice,
-    deleteCustomerInvoice,
+  deleteCustomerInvoice,
+  newCustomerItemInvoice
 } from '../types';
 
 @Injectable()
@@ -25,11 +25,32 @@ export class CustomerInvoiceService {
         },
       });
       const computedItemsArray = dto.customer_invoice_items.map((item) => {
-        //@ts-ignore
+        const {
+          customer_invoice_print_option_id,
+          customer_invoice_item_id,
+          customer_invoice_item_height,
+          customer_invoice_item_width,
+          customer_invoice_item_size,
+          customer_invoice_item_price,
+          customer_invoice_item_quantity,
+          customer_invoice_item_total,
+          customer_invoice_item_notes,
+        } = item
+        const invoiceItem = {
+          customer_invoice_id: 0,
+          customer_invoice_print_option_id,
+          customer_invoice_item_id,
+          customer_invoice_item_height,
+          customer_invoice_item_width,
+          customer_invoice_item_size,
+          customer_invoice_item_price,
+          customer_invoice_item_quantity,
+          customer_invoice_item_total,
+          customer_invoice_item_notes
+        }
         item.customer_invoice_id = newInvoice.customer_invoice_id;
-        delete item.item_name;
-        delete item.print_name;
-        return item;
+        invoiceItem.customer_invoice_id = newInvoice.customer_invoice_id;
+        return invoiceItem
       });
       await this.prisma.customer_invoices_items_details.createMany({
         data: computedItemsArray,
@@ -56,5 +77,29 @@ export class CustomerInvoiceService {
       message: error,
     });
    }
+  }
+
+  async newCustomerItemsInvoice(dto: newCustomerItemInvoice){
+    try{
+      await this.prisma.customer_invoices_items_details.create({
+        data: {
+          customer_invoice_id: dto.invoice_id,
+          customer_invoice_print_option_id: dto.invoice_print_option_id,
+          customer_invoice_item_id: dto.invoice_item_id,
+          customer_invoice_item_width: dto.width,
+          customer_invoice_item_height: dto.height,
+          customer_invoice_item_size: dto.size,
+          customer_invoice_item_price: dto.price,
+          customer_invoice_item_quantity: dto.quantity,
+          customer_invoice_item_total: dto.quantity,
+          customer_invoice_item_notes: dto.notes
+        }})
+      return { response: 'success', message: 'This Invoice is deleted' };
+     } catch(error){
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
+     }
   }
 }

@@ -1,15 +1,16 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format, compareDesc } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 
 @Injectable()
 export class SystemReportsService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getCustomersSummary(Params: { customer_id: string }) {
-    if (Params.customer_id !== '0' && Params.customer_id) {
+  async getCustomersSummary({ customer_id }: { customer_id: string }) {
+    if (customer_id !== '0' && customer_id) {
       const customersInvoices = await this.prisma.customer_invoices.findMany({
         where: {
-          customer_id: +Params.customer_id,
+          customer_id: +customer_id,
           customer_invoice_credit: {
             notIn: 0,
           },
@@ -23,31 +24,11 @@ export class SystemReportsService {
         },
       });
 
-      let responseArray: any = [];
-
-      customersInvoices.map(async (invoice) => {
-        let obj: any = {};
-
-        obj.rowKey = responseArray.length + 1;
-        obj.notes = invoice.invoice_note;
-        obj.credit = invoice.customer_invoice_credit;
-        obj.debit = 0;
-        obj.total = invoice.customer_invoice_after_discount;
-        obj.customer_name = invoice.customers_data.customer_name;
-        obj.date = invoice.customer_invoice_date;
-        //.toJSON().slice(0, 10);
-        obj.record_type = 'I';
-        obj.record_id = invoice.customer_invoice_id;
-        obj.balance = 0;
-
-        responseArray.push(obj);
-      });
-
       const customersReceipt = await this.prisma.cash_receipt_voucher.findMany({
         where: {
           customer_id: {
             notIn: null,
-            in: +Params.customer_id,
+            in: +customer_id,
           },
         },
         include: {
@@ -59,37 +40,75 @@ export class SystemReportsService {
         },
       });
 
-      customersReceipt.map(async (receipt) => {
-        let obj: any = {};
+      let responseArray: Record<string, string | number>[] = [];
 
-        obj.rowKey = responseArray.length + 1;
-        obj.notes = receipt.notes;
-        obj.debit = receipt.voucher_amount;
-        obj.credit = 0;
-        // obj.total = receipt.customer_invoice_after_discount;
-        obj.customer_name = receipt.customers_data.customer_name;
-        obj.date = receipt.voucher_date;
-        obj.record_type = 'R';
-        obj.record_id = receipt.receipt_voucher_id;
-        obj.balance = 0;
-
-        responseArray.push(obj);
+      const computedCustomerInvoice = customersInvoices.map((invoice) => {
+        const {
+          invoice_note,
+          customer_invoice_credit,
+          customer_invoice_after_discount,
+          customers_data,
+          customer_invoice_date,
+          customer_invoice_id,
+        } = invoice;
+        const obj = {
+          notes: invoice_note,
+          credit: customer_invoice_credit,
+          debit: 0,
+          total: customer_invoice_after_discount,
+          customer_name: customers_data.customer_name,
+          date: format(customer_invoice_date, 'yyyy-MM-dd'),
+          record_name: "فاتورة",
+          record_id: customer_invoice_id,
+          balance: 0,
+        };
+        return obj;
       });
 
-      responseArray.sort(function (a: string, b: string) {
-        //@ts-ignore
-        return b.date - a.date;
+      const computedCustomerReceipts = customersReceipt.map((receipt) => {
+        const {
+          notes,
+          voucher_amount,
+          voucher_date,
+          customers_data,
+          receipt_voucher_id,
+        } = receipt;
+
+        const obj = {
+        notes: notes,
+        debit: voucher_amount,
+        credit: 0,
+        // total: receipt.customer_invoice_after_discount,
+        customer_name: customers_data.customer_name,
+        date: format(voucher_date, 'yyyy-MM-dd'),
+        record_type: 'استلام نقدي',
+        record_id: receipt_voucher_id,
+        balance: 0,
+      };
+        return obj
+      });
+
+      const finalArray = [
+        ...computedCustomerInvoice,
+        ...computedCustomerReceipts
+      ]
+
+      finalArray.sort(function (a: any, b: any) {
+        const d1 = new Date(a.date)
+        const d2 = new Date(b.date)
+        console.log(compareDesc(d1, d2))
+        return compareDesc(d1, d2)
       });
 
       let balance = 0;
-      responseArray.forEach((element) => {
-        balance = element.credit - element.debit + balance;
-        element.balance = balance;
-        element.date = element.date.toJSON().slice(0, 10);
-      });
+      // responseArray.forEach((element) => {
+      //   balance = element.credit - element.debit + balance;
+      //   element.balance = balance;
+      //   element.date = element.date.toJSON().slice(0, 10);
+      // });
 
       return {
-        data: responseArray,
+        data: finalArray,
       };
     } else {
       return {
@@ -251,7 +270,8 @@ export class SystemReportsService {
         obj.balance = 0;
         obj.item_in = 0;
         obj.item_out =
-          +item.customer_invoice_item_size * +item.customer_invoice_item_quantity;
+          +item.customer_invoice_item_size *
+          +item.customer_invoice_item_quantity;
         ItemsSummaryData.push(obj);
       });
 
@@ -265,7 +285,8 @@ export class SystemReportsService {
         obj.balance = 0;
         obj.item_out = 0;
         obj.item_in =
-          +item.supplier_invoice_item_size * +item.supplier_invoice_item_quantity;
+          +item.supplier_invoice_item_size *
+          +item.supplier_invoice_item_quantity;
         ItemsSummaryData.push(obj);
       });
 

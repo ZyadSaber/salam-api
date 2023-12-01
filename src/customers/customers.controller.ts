@@ -5,19 +5,20 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { CustomersService } from './customers.service';
-import { newCustomer, editCustomer, deleteCustomer } from '../types';
+import { newCustomer, editCustomer, deleteCustomer, customerParam } from '../types';
 
 @UseGuards(JwtGuard)
 @Controller('api/basic_data/customers')
 export class CustomersController {
   constructor(private CustomersService: CustomersService) {}
   @Get('customers_table_data')
-  getCustomers() {
-    return this.CustomersService.getCustomersMainTable();
+  getCustomers(@Query() params: customerParam) {
+    return this.CustomersService.getCustomersMainTable(params);
   }
 
   @Get('customers_list')

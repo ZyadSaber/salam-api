@@ -61,7 +61,6 @@ model user_permissions {
   status  Boolean @default(false)
 
   app_pages app_pages? @relation(fields: [page_id], references: [page_id])
-  // page_parent page_parent? @relation(fields: [page_parent_id], references: [page_parent_id])
   users     users?     @relation(fields: [user_id], references: [id])
 }
 
@@ -81,9 +80,8 @@ model suppliers_data {
 
   supplier_name String
 
-  email   String?
-  phone   String?
-  address String?
+  phone   String? @default("")
+  address String? @default("")
 
   supplier_invoices    supplier_invoices[]
   cash_receipt_voucher cash_receipt_voucher[]
@@ -97,9 +95,8 @@ model customers_data {
 
   customer_name String
 
-  email                String?
-  phone                String?
-  address              String?
+  phone                String?                @default("")
+  address              String?                @default("")
   customer_invoices    customer_invoices[]
   cash_receipt_voucher cash_receipt_voucher[]
   cash_payment_voucher cash_payment_voucher[]
@@ -110,10 +107,11 @@ model items_data {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  item_name String
-  item_unit String
+  item_name  String
+  item_unit  String?  @default("unit")
+  item_price Decimal? @default(0)
 
-  item_description String?
+  item_description String? @default("")
 
   supplier_invoices_items_details supplier_invoices_items_details[]
   item_inventory                  item_inventory[]
@@ -138,7 +136,7 @@ model expense_types {
 
   expense_type_name String
 
-  expense_type_note    String?
+  expense_type_note    String?                @default("")
   cash_payment_voucher cash_payment_voucher[]
   cash_receipt_voucher cash_receipt_voucher[]
 }
@@ -208,8 +206,8 @@ model customer_invoices {
 
   customer_invoice_total          Decimal
   customer_invoice_design_fee     Decimal @default(0)
-  customer_invoice_discount       Decimal  @default(0)
-  customer_invoice_after_discount Decimal 
+  customer_invoice_discount       Decimal @default(0)
+  customer_invoice_after_discount Decimal
   customer_invoice_paid           Decimal @default(0)
   customer_invoice_credit         Decimal @default(0)
   invoice_note                    String?

@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newPrintOptions,
@@ -10,14 +11,29 @@ import {
 export class PrintOptionsService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getPrintOptionsMainTable() {
-    const printOptions = await this.prisma.print_options.findMany();
-    printOptions.map((printOption) => {
-      //@ts-ignore
-      printOption.query_status = 'q';
+  async getPrintOptionsMainTable(params?: any) {
+    const {print_option_name, print_option_note} = params
+    const printOptions = await this.prisma.print_options.findMany({
+      where:{
+        print_option_name: {
+          contains: print_option_name || undefined
+        },
+        print_option_note: {
+          contains: print_option_note || undefined
+        }
+      }
+    });
+    const computedPrintOptions = printOptions.map((printOption) => {
+      const option = {
+        ...printOption,
+        created_at: format(printOption.created_at, 'yyyy-MM-dd hh:mm aa'),
+        updated_at: format(printOption.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q'
+      }
+      return option
     });
     return {
-      data: printOptions,
+      data: computedPrintOptions,
     };
   }
 

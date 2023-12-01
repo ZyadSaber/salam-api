@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
@@ -13,6 +14,7 @@ import {
   newExpensesType,
   editExpensesType,
   deleteExpensesType,
+  expensesTypeSearchParams
 } from '../types';
 
 @UseGuards(JwtGuard)
@@ -21,8 +23,8 @@ export class ExpensesTypeController {
   constructor(private expensesTypeService: ExpensesTypeService) {}
 
   @Get('expenses_type_table_data')
-  getCustomers() {
-    return this.expensesTypeService.getExpensesTypeData();
+  getCustomers(@Query() params: expensesTypeSearchParams) {
+    return this.expensesTypeService.getExpensesTypeData(params);
   }
 
   @Post('expenses_type_table_data_dml')

@@ -76,3 +76,26 @@ export class deleteCustomerInvoice {
     @IsNotEmpty()
   invoice_id: number
 }
+
+export class newCustomerItemInvoice{
+  @IsNotEmpty()
+  invoice_id: number;
+  @IsNotEmpty()
+  invoice_print_option_id: number;
+  @IsNotEmpty()
+  invoice_item_id: number;
+  @IsNotEmpty()
+  width: number;
+  @IsNotEmpty()
+  height: number;
+  @IsNotEmpty()
+  size: number;
+  @IsNotEmpty()
+  quantity: number;
+  @IsNotEmpty()
+  price: number;
+  @IsNotEmpty()
+  total: number;
+  @IsNotEmpty()
+  notes: string;
+}

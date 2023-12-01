@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
@@ -17,8 +18,8 @@ export class ItemsController {
   constructor(private itemsService: ItemsService) {}
 
   @Get('items_table_data')
-  getItems() {
-    return this.itemsService.getItemsMainTable();
+  getItems(@Query() params: any) {
+    return this.itemsService.getItemsMainTable(params);
   }
 
   @Get('items_list')

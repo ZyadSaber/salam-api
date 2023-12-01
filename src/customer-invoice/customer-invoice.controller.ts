@@ -1,24 +1,13 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Post,
-  Put,
-  UseGuards,
-  Res
-} from '@nestjs/common';
+import { Body, Controller, Delete, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { CustomerInvoiceService } from './customer-invoice.service';
-import { createReadStream } from 'fs';
-import { join } from 'path';
 import {
   newCustomerInvoice,
-  //   editSupplierInvoice,
   deleteCustomerInvoice,
+  newCustomerItemInvoice
 } from '../types';
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('api/invoices/customer_invoice')
 export class CustomerInvoiceController {
   constructor(private customerInvoice: CustomerInvoiceService) {}
@@ -29,8 +18,12 @@ export class CustomerInvoiceController {
   }
 
   @Delete('customer_invoice_dml')
-    deleteCustomerInvoice(@Body() dto:deleteCustomerInvoice){
-      return this.customerInvoice.delete_main_invoice(dto)
-    }
-  
+  deleteCustomerInvoice(@Body() dto: deleteCustomerInvoice) {
+    return this.customerInvoice.delete_main_invoice(dto);
+  }
+
+  @Post('customer_items_invoice_dml')
+  postItemsCustomers(@Body() dto: newCustomerItemInvoice) {
+    return this.customerInvoice.newCustomerItemsInvoice(dto);
+  }
 }

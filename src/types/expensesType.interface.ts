@@ -22,3 +22,8 @@ export class deleteExpensesType {
   @IsNotEmpty()
   expense_type_id: number;
 }
+
+export class expensesTypeSearchParams{
+  expense_type_name?: string;
+  expense_type_note?: string;
+}

@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
@@ -21,11 +22,11 @@ export class PrintOptionsController {
   constructor(private printOptionsService: PrintOptionsService) {}
 
   @Get('print_options_table_data')
-  getPrintOptions() {
-    return this.printOptionsService.getPrintOptionsMainTable();
+  getPrintOptions(@Query() params: any) {
+    return this.printOptionsService.getPrintOptionsMainTable(params);
   }
 
-  @Get('print_options_lins')
+  @Get('print_options_list')
   getCustomerList() {
     return this.printOptionsService.getPrintOptionsList();
   }

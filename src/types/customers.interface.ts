@@ -26,3 +26,9 @@ export class deleteCustomer {
   @IsNotEmpty()
   customer_id: number;
 }
+
+export class customerParam{
+  customer_name?: string;
+  phone?: string;
+  address?: string;
+}

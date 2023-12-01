@@ -1,23 +1,41 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaModuleService } from '../prisma-module/prisma-module.service';
+import {format} from "date-fns"
+import { PrismaModuleService } from '../prisma-module/prisma-module.service'
 import {
   newExpensesType,
   editExpensesType,
   deleteExpensesType,
+  expensesTypeSearchParams
 } from '../types';
 
 @Injectable()
 export class ExpensesTypeService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getExpensesTypeData() {
-    const expenseTypes = await this.prisma.expense_types.findMany();
-    expenseTypes.map((printOption) => {
-      //@ts-ignore
-      printOption.query_status = 'q';
+  async getExpensesTypeData(param?: expensesTypeSearchParams) {
+    const {expense_type_name, expense_type_note} = param
+    const expenseTypes = await this.prisma.expense_types.findMany({
+      where:{
+        expense_type_name: {
+          contains: expense_type_name || undefined
+        },
+        expense_type_note: {
+          contains: expense_type_note || undefined
+        }
+      }
+    });
+    const computedExpenseTypes = expenseTypes.map((printOption) => {
+      const obj = {
+        ...printOption,
+        created_at: format(printOption.created_at, 'yyyy-MM-dd hh:mm aa'),
+        updated_at: format(printOption.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q'
+      }
+      format(printOption.created_at, 'yyyy-MM-dd hh:mm:ss aa')
+      return obj
     });
     return {
-      data: expenseTypes,
+      data: computedExpenseTypes,
     };
   }
 

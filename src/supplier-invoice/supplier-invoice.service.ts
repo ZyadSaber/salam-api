@@ -35,9 +35,30 @@ export class SupplierInvoiceService {
         },
       });
       const computedItemsArray = dto.supplier_invoice_items.map((item) => {
+        const {
+          supplier_invoice_item_id,
+          supplier_invoice_item_height,
+          supplier_invoice_item_width,
+          supplier_invoice_item_size,
+          supplier_invoice_item_price,
+          supplier_invoice_item_quantity,
+          supplier_invoice_item_total,
+          supplier_invoice_item_notes,
+        } = item
+        const invoiceItem = {
+          supplier_invoice_id: 0,
+          supplier_invoice_item_id,
+          supplier_invoice_item_height,
+          supplier_invoice_item_width,
+          supplier_invoice_item_size,
+          supplier_invoice_item_price,
+          supplier_invoice_item_quantity,
+          supplier_invoice_item_total,
+          supplier_invoice_item_notes
+        }
         item.supplier_invoice_id = newInvoice.supplier_invoice_id;
-        delete item.item_name;
-        return item;
+        invoiceItem.supplier_invoice_id = newInvoice.supplier_invoice_id;
+        return invoiceItem
       });
       await this.prisma.supplier_invoices_items_details.createMany({
         data: computedItemsArray,

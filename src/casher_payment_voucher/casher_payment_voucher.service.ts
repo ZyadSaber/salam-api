@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { add, format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newPaymentVoucher,
@@ -9,19 +10,25 @@ import {
 
 @Injectable()
 export class CasherPaymentVoucherService {
-  constructor(
-    private prisma: PrismaModuleService,
-  ) {}
+  constructor(private prisma: PrismaModuleService) {}
 
   async getMainTable(params: paramsPaymentType) {
-    const calculatedDateFrom = new Date(params.date_from);
-    calculatedDateFrom.setHours(0, 0, 0, 0);
-
+    const { date_from, date_to } = params;
+    const calculatedDateFrom = add(new Date(date_from), {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    });
+    const calculatedDateTo = add(new Date(date_to), {
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+    });
     const getRecords = await this.prisma.cash_payment_voucher.findMany({
       where: {
         voucher_date: {
-          gte: params.date_from ? calculatedDateFrom : undefined,
-          lte: params.date_from ? new Date(params.date_to) : undefined,
+          gte: date_from ? calculatedDateFrom : undefined,
+          lte: date_to ? calculatedDateTo : undefined,
         },
       },
       select: {
@@ -29,19 +36,19 @@ export class CasherPaymentVoucherService {
         customers_data: {
           select: {
             customer_name: true,
-            customer_id: true
+            customer_id: true,
           },
         },
         suppliers_data: {
           select: {
             supplier_name: true,
-            supplier_id: true
+            supplier_id: true,
           },
         },
         expense_types: {
           select: {
             expense_type_name: true,
-            expense_type_id: true
+            expense_type_id: true,
           },
         },
         voucher_amount: true,
@@ -51,52 +58,51 @@ export class CasherPaymentVoucherService {
         notes: true,
       },
     });
-    getRecords.forEach((record) => {
-      //@ts-ignore
-      record.voucher_date = `${record.voucher_date.getFullYear()}-${
-        record.voucher_date.getMonth() + 1
-      }-${record.voucher_date.getDate()}`;
-      if (record.customers_data) {
-        //@ts-ignore
-        record.voucher_type_name = 'Customer';
-        //@ts-ignore
-        record.voucher_id = record.customers_data.customer_id;
-        //@ts-ignore
-        record.voucher_type = 'C';
-        //@ts-ignore
-        record.voucher_name = record.customers_data.customer_name;
-        delete record.customers_data;
-        delete record.suppliers_data;
-        delete record.expense_types;
-      } else if (record.suppliers_data) {
-        //@ts-ignore
-        record.voucher_type_name = 'Supplier';
-        //@ts-ignore
-        record.voucher_type = 'S';
-        //@ts-ignore
-        record.voucher_id = record.suppliers_data.supplier_id;
-        //@ts-ignore
-        record.voucher_name = record.suppliers_data.supplier_name;
-        delete record.customers_data;
-        delete record.suppliers_data;
-        delete record.expense_types;
-      } else if (record.expense_types) {
-        //@ts-ignore
-        record.voucher_name = record.expense_types.expense_type_name;
-        //@ts-ignore
-        record.voucher_type_name = 'Expense';
-        //@ts-ignore
-        record.voucher_id = record.expense_types.expense_type_id;
-        //@ts-ignore
-        record.voucher_type = 'O';
-        delete record.customers_data;
-        delete record.suppliers_data;
-        delete record.expense_types;
-        //@ts-ignore
-        record.query_status = 'q';
+    const Records = getRecords.map((record) => {
+      const {
+        customers_data,
+        voucher_date,
+        created_at,
+        updated_at,
+        suppliers_data,
+        expense_types,
+        voucher_amount,
+        notes,
+      } = record;
+      const obj = {
+        voucher_date: format(voucher_date, 'yyyy-MM-dd'),
+        voucher_type_name: '',
+        voucher_id: 0,
+        voucher_type: '',
+        voucher_name: '',
+        voucher_amount,
+        notes,
+        created_at: format(created_at, 'yyyy-MM-dd hh:mm aa'),
+        updated_at: format(updated_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q',
+      };
+      if (customers_data) {
+        const { customer_id, customer_name } = customers_data;
+        obj.voucher_type_name = 'Customer';
+        obj.voucher_id = customer_id;
+        obj.voucher_type = 'C';
+        obj.voucher_name = customer_name;
+      } else if (suppliers_data) {
+        const { supplier_id, supplier_name } = suppliers_data;
+        obj.voucher_type_name = 'Supplier';
+        obj.voucher_type = 'S';
+        obj.voucher_id = supplier_id;
+        obj.voucher_name = supplier_name;
+      } else if (expense_types) {
+        const { expense_type_name, expense_type_id } = expense_types;
+        obj.voucher_name = expense_type_name;
+        obj.voucher_type_name = 'Expense';
+        obj.voucher_id = expense_type_id;
+        obj.voucher_type = 'O';
       }
+      return obj;
     });
-    return { data: getRecords };
+    return { data: Records };
   }
 
   async newPaymentVoucher(dto: newPaymentVoucher) {

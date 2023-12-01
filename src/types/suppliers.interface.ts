@@ -26,3 +26,9 @@ export class deleteSupplier {
   @IsNotEmpty()
   supplier_id: number;
 }
+
+export class supplierParam {
+  supplier_name?: string;
+  phone?: string;
+  address?: string;
+}

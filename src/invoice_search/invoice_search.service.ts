@@ -202,6 +202,8 @@ export class InvoiceSearchService {
       data.forEach((invoice) => {
         //@ts-ignore
         invoice.item = `${invoice.print_options.print_option_name} / ${invoice.items_data.item_name}`;
+        //@ts-ignore
+        invoice.invoice_type = params.invoice_type
         delete invoice.items_data;
         delete invoice.print_options;
         //@ts-ignore
@@ -259,6 +261,8 @@ export class InvoiceSearchService {
       data.forEach((invoice) => {
         //@ts-ignore
         invoice.item = invoice.items_data.item_name;
+        //@ts-ignore
+        invoice.invoice_type = params.invoice_type
         delete invoice.items_data;
         //@ts-ignore
         invoice.width = invoice.supplier_invoice_item_width;

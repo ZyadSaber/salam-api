@@ -4,7 +4,8 @@ import { CustomerInvoiceService } from './customer-invoice.service';
 import {
   newCustomerInvoice,
   deleteCustomerInvoice,
-  newCustomerItemInvoice
+  newCustomerItemInvoice,
+  editCustomerItemInvoice
 } from '../types';
 
 @UseGuards(JwtGuard)
@@ -25,5 +26,15 @@ export class CustomerInvoiceController {
   @Post('customer_items_invoice_dml')
   postItemsCustomers(@Body() dto: newCustomerItemInvoice) {
     return this.customerInvoice.newCustomerItemsInvoice(dto);
+  }
+
+  @Put('customer_items_invoice_dml')
+  putItemsCustomers(@Body() dto: editCustomerItemInvoice) {
+    return this.customerInvoice.editCustomerItemsInvoice(dto);
+  }
+
+  @Delete('customer_items_invoice_dml')
+  deleteItemsCustomers(@Body() dto: editCustomerItemInvoice) {
+    return this.customerInvoice.deleteCustomerItemsInvoice(dto);
   }
 }

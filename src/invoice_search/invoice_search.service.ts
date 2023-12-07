@@ -176,6 +176,9 @@ export class InvoiceSearchService {
         where: {
           customer_invoice_id: +params.invoice_no,
         },
+        orderBy:{
+          row_key: "asc"
+        },
         select: {
           row_key: true,
           print_options: {

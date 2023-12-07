@@ -131,6 +131,7 @@ export class AuthService {
             page_name: true,
             page_link: true,
             page_disabled: true,
+            page_icon: true,
             run_in_modal: true,
             page_parent: {
               select: {
@@ -169,6 +170,7 @@ export class AuthService {
           pageParent[index].app_pages.push({
             page_disabled: p.app_pages.page_disabled,
             page_name: p.app_pages.page_name,
+            page_icon: p.app_pages.page_icon,
             page_link: `${p.app_pages.page_link}`,
             run_in_modal: p.app_pages.run_in_modal,
             page_id: p.app_pages.page_id,

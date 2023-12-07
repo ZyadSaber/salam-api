@@ -44,6 +44,7 @@ model app_pages {
   page_parent_id Int?
 
   page_name     String  @unique()
+  page_icon     String  @default("test")
   page_link     String  @unique()
   page_disabled String? @default("N") @db.VarChar(1)
   run_in_modal  String? @default("N") @db.VarChar(1)

@@ -96,6 +96,10 @@ export class newCustomerItemInvoice{
   price: number;
   @IsNotEmpty()
   total: number;
-  @IsNotEmpty()
   notes: string;
+}
+
+export class editCustomerItemInvoice extends newCustomerItemInvoice{
+  @IsNotEmpty()
+  row_key: number
 }

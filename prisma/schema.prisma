@@ -126,7 +126,7 @@ model print_options {
 
   print_option_name String
 
-  print_option_note               String?
+  print_option_note               String?                           @default("")
   customer_invoices_items_details customer_invoices_items_details[]
 }
 
@@ -169,7 +169,7 @@ model supplier_invoices {
   supplier_invoice_paid           Decimal
   supplier_invoice_credit         Decimal
 
-  invoice_note String?
+  invoice_note String? @default("")
 
   suppliers_data                  suppliers_data                    @relation(fields: [supplier_id], references: [supplier_id])
   supplier_invoices_items_details supplier_invoices_items_details[]
@@ -188,7 +188,7 @@ model supplier_invoices_items_details {
   supplier_invoice_item_quantity Decimal
   supplier_invoice_item_price    Decimal
   supplier_invoice_item_total    Decimal
-  supplier_invoice_item_notes    String?
+  supplier_invoice_item_notes    String? @default("")
 
   supplier_invoice_item_id Int
   items_data               items_data        @relation(fields: [supplier_invoice_item_id], references: [item_id])
@@ -211,7 +211,7 @@ model customer_invoices {
   customer_invoice_after_discount Decimal
   customer_invoice_paid           Decimal @default(0)
   customer_invoice_credit         Decimal @default(0)
-  invoice_note                    String?
+  invoice_note                    String? @default("")
 
   customer_invoices_items_details customer_invoices_items_details[]
   item_inventory                  item_inventory[]
@@ -234,7 +234,7 @@ model customer_invoices_items_details {
   customer_invoice_item_price      Decimal
   customer_invoice_item_total      Decimal
 
-  customer_invoice_item_notes String?
+  customer_invoice_item_notes String? @default("")
 
   customer_invoices customer_invoices @relation(fields: [customer_invoice_id], references: [customer_invoice_id])
   items_data        items_data        @relation(fields: [customer_invoice_item_id], references: [item_id])
@@ -243,19 +243,20 @@ model customer_invoices_items_details {
 
 model employees_data {
   employee_id Int      @id @default(autoincrement())
+
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   employee_name            String
-  employee_address         String?
+  employee_address         String? @default("")
   employee_phone           Int?
   employee_mobile          Int?
   employee_job_title       String
-  employee_email           String?
   employee_salary          Int
-  employee_attendance_time String
-  employee_leaving_time    String
-  date_of_hiring           String?
+  employee_attendance_time DateTime
+  employee_leaving_time    DateTime
+
+  date_of_hiring           DateTime?
 }
 
 model cash_receipt_voucher {
@@ -270,7 +271,7 @@ model cash_receipt_voucher {
   customer_id     Int?
   supplier_id     Int?
   expense_type_id Int?
-  notes           String?
+  notes           String? @default("")
 
   customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
   suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])
@@ -289,7 +290,7 @@ model cash_payment_voucher {
   customer_id     Int?
   supplier_id     Int?
   expense_type_id Int?
-  notes           String?
+  notes           String? @default("")
 
   customers_data customers_data? @relation(fields: [customer_id], references: [customer_id])
   suppliers_data suppliers_data? @relation(fields: [supplier_id], references: [supplier_id])

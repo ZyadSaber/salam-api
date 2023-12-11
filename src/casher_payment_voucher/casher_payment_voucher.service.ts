@@ -33,6 +33,7 @@ export class CasherPaymentVoucherService {
       },
       select: {
         voucher_date: true,
+        payment_voucher_id: true,
         customers_data: {
           select: {
             customer_name: true,
@@ -54,7 +55,6 @@ export class CasherPaymentVoucherService {
         voucher_amount: true,
         updated_at: true,
         created_at: true,
-        payment_voucher_id: true,
         notes: true,
       },
     });
@@ -68,8 +68,10 @@ export class CasherPaymentVoucherService {
         expense_types,
         voucher_amount,
         notes,
+        payment_voucher_id,
       } = record;
       const obj = {
+        payment_voucher_id,
         voucher_date: format(voucher_date, 'yyyy-MM-dd'),
         voucher_type_name: '',
         voucher_id: 0,

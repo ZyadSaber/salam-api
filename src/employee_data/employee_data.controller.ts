@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { EmployeeDataService } from './employee_data.service';
@@ -17,22 +18,22 @@ export class EmployeeDataController {
   constructor(private EmployeeDataService: EmployeeDataService) {}
 
   @Get('employee_table_data')
-  getEmployees() {
-    return this.EmployeeDataService.getEmployeesMainData();
+  getEmployees(@Query() params: any) {
+    return this.EmployeeDataService.getEmployeesMainData(params);
   }
 
-  @Post('employee_table_data_dml')
-  postEmployee(@Body() dto: newEmployee) {
-    return this.EmployeeDataService.newEmployee(dto);
-  }
+  // @Post('employee_table_data_dml')
+  // postEmployee(@Body() dto: newEmployee) {
+  //   return this.EmployeeDataService.newEmployee(dto);
+  // }
 
-  @Put('employee_table_data_dml')
-  putEmployee(@Body() dto: editEmployee) {
-    return this.EmployeeDataService.editEmployee(dto);
-  }
+  // @Put('employee_table_data_dml')
+  // putEmployee(@Body() dto: editEmployee) {
+  //   return this.EmployeeDataService.editEmployee(dto);
+  // }
 
-  @Delete('employee_table_data_dml')
-  deleteEmployee(@Body() dto: deleteEmployee) {
-    return this.EmployeeDataService.deleteEmployee(dto);
-  }
+  // @Delete('employee_table_data_dml')
+  // deleteEmployee(@Body() dto: deleteEmployee) {
+  //   return this.EmployeeDataService.deleteEmployee(dto);
+  // }
 }

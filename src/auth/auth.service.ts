@@ -1,10 +1,15 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaModuleService } from '../prisma-module/prisma-module.service';
-import { singUpType, singInType, getPages } from 'src/types';
-import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { format } from 'date-fns';
+import * as argon from 'argon2';
+import { PrismaModuleService } from '../prisma-module/prisma-module.service';
+import {
+  singUpType,
+  singInType,
+  updateUserType,
+  deleteUserType,
+} from 'src/types';
 
 @Injectable()
 export class AuthService {
@@ -20,29 +25,77 @@ export class AuthService {
 
     //save the new user to the database
     try {
-      const saveUser = await this.prisma.users.create({
+      await this.prisma.users.create({
         data: {
           user_name: dto.user_name,
           password_hash: passwordHash,
           first_name: dto.first_name,
           last_name: dto.last_name,
-          // dto:
         },
       });
 
-      //return the new user
-      return this.signToken(
-        saveUser.id,
-        saveUser.user_name,
-        saveUser.first_name,
-      );
+      return {
+        response: 'success',
+      };
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('user_name already in use');
-        }
-      }
-      throw error;
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
+    }
+  }
+
+  async updateUser(dto: updateUserType) {
+    //generate the password hash
+    const passwordHash = await argon.hash(dto.password);
+
+    //save the new user to the database
+    try {
+      await this.prisma.users.update({
+        where: {
+          id: +dto.id,
+        },
+        data: {
+          user_name: dto.user_name,
+          password_hash: passwordHash,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
+        },
+      });
+
+      return {
+        response: 'success',
+      };
+    } catch (error) {
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
+    }
+  }
+
+  async deleteUser(dto: deleteUserType) {
+    try {
+      await this.prisma.user_permissions.deleteMany({
+        where: {
+          user_id: +dto.id,
+        },
+      });
+
+      await this.prisma.users.delete({
+        where: {
+          id: +dto.id,
+        },
+      });
+
+      return {
+        response: 'success',
+      };
+    } catch (error) {
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
     }
   }
 
@@ -99,12 +152,33 @@ export class AuthService {
     };
   }
 
-  async getUsers() {
-    const users = await this.prisma.users.findMany();
-    users.map((user) => {
-      delete user.password_hash;
+  async getUsers(params?: { user_name?: string; name?: string }) {
+    const { user_name, name } = params;
+    const users = await this.prisma.users.findMany({
+      where: {
+        user_name: {
+          contains: user_name || undefined,
+        },
+        first_name: {
+          contains: name || undefined,
+        },
+        last_name: {
+          contains: name || undefined,
+        },
+      },
     });
-    return { data: users };
+    const computedArray = users.map((record) => {
+      const obj = {
+        ...record,
+        updated_at: format(record.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        created_at: format(record.created_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q',
+      };
+      return obj;
+    });
+    return {
+      data: computedArray,
+    };
   }
 
   async getUserPage(dto: { user_name: string }) {
@@ -183,23 +257,23 @@ export class AuthService {
   }
 
   async updatePagesPermissions(dto) {
-    const computedPages = await dto.map((record) => {
-      record.status = record.status === 'Y' ? true : false;
-      delete record.page_name;
-      delete record.page_link;
-      return record;
-    });
-    const updatedData = await computedPages.map((record) => {
-      console.log(record);
-      this.prisma.user_permissions.update({
-        where: {
-          user_permissions_id: +record.user_permissions_id,
-        },
-        data: {
-          status: record.status,
-        },
+    try {
+      dto.forEach(async (record) => {
+        await this.prisma.user_permissions.update({
+          where: {
+            user_permissions_id: +record.user_permissions_id,
+          },
+          data: {
+            status: record.status === 'Y' ? true : false,
+          },
+        });
       });
-    });
-    return { response: 'success' };
+      return { response: 'success' };
+    } catch (error) {
+      throw new ForbiddenException({
+        response: 'error',
+        message: error,
+      });
+    }
   }
 }

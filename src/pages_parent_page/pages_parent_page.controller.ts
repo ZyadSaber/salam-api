@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { PagesParentPageService } from './pages_parent_page.service';
@@ -21,8 +22,8 @@ export class PagesParentPageController {
   constructor(private PagesParentPageService: PagesParentPageService) {}
 
   @Get('pages_parent_data_table')
-  getPagesParent() {
-    return this.PagesParentPageService.getPagesParentMainTable();
+  getPagesParent(@Query() params: {page_parent_name?:string, hidden?: string }) {
+    return this.PagesParentPageService.getPagesParentMainTable(params);
   }
 
   @Post('pages_parent_data_table_dml')

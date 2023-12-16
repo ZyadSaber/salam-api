@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { LabelsPageService } from './labels-page.service';
@@ -17,8 +18,8 @@ export class LabelsPageController {
   constructor(private LabelsPageService: LabelsPageService) {}
 
   @Get('label_data_table')
-  getLabels() {
-    return this.LabelsPageService.getLabelMainTable();
+  getLabels(@Query() params?:  {arabic_name?: string, english_name?: string}) {
+    return this.LabelsPageService.getLabelMainTable(params);
   }
 
   @Post('label_data_table_dml')

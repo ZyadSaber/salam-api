@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import {
   newPagesParentName,
@@ -10,15 +11,30 @@ import {
 export class PagesParentPageService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getPagesParentMainTable() {
-    const pagesParentData = await this.prisma.page_parent.findMany();
-    pagesParentData.forEach((record) => {
-      //@ts-ignore
-      record.query_status = 'q';
-      return record;
+  async getPagesParentMainTable(params: {page_parent_name?:string, hidden?: string }) {
+    const {page_parent_name, hidden} = params
+    const pagesParentData = await this.prisma.page_parent.findMany({
+      where:{
+        page_parent_name: {
+          contains: page_parent_name || undefined
+        },
+        hidden: {
+          contains: hidden || undefined
+        }
+      }
     });
-
-    return { data: pagesParentData };
+    const computedArray = pagesParentData.map((record) => {
+      const obj = {
+        ...record,
+        updated_at: format(record.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        created_at: format(record.created_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q',
+      };
+      return obj;
+    });
+    return {
+      data: computedArray,
+    };
   }
 
   async newPagesParent(dto: newPagesParentName) {

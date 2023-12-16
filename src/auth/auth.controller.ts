@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { singUpType } from '../types';
+import { singUpType, updateUserType, deleteUserType } from '../types';
 import { JwtGuard } from './guard';
 
 @Controller('api/auth_security')
@@ -22,6 +22,12 @@ export class AuthController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('users_info')
+  appPages(@Query() params?: { user_name?: string; name?: string }) {
+    return this.authService.getUsers(params);
+  }
+
+  @UseGuards(JwtGuard)
   @Post('users_info_dml')
   createUser(@Body() dto: singUpType) {
     return this.authService.signup(dto);
@@ -29,19 +35,13 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @Put('users_info_dml')
-  EditUser(@Body() dto: singUpType) {
-    return this.authService.signup(dto);
+  EditUser(@Body() dto: updateUserType) {
+    return this.authService.updateUser(dto);
   }
   @UseGuards(JwtGuard)
   @Delete('users_info_dml')
-  deleteUser(@Body() dto: singUpType) {
-    return this.authService.signup(dto);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get('users_info')
-  appPages() {
-    return this.authService.getUsers();
+  deleteUser(@Body() dto: deleteUserType) {
+    return this.authService.deleteUser(dto);
   }
 
   @UseGuards(JwtGuard)

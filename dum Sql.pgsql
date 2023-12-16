@@ -16,6 +16,23 @@
 
 -- select * from users
 
+--  CREATE TRIGGER add_page_to_user_trg AFTER INSERT ON app_pages
+--  FOR EACH ROW execute Procedure add_page_to_user();
+
+CREATE OR REPLACE FUNCTION add_page_to_user() RETURNS TRIGGER AS $add_page_to_user_trg$
+DECLARE
+  f_user_id INTEGER;  -- Assuming 'id' is of type INTEGER
+BEGIN
+  FOR f_user_id IN SELECT id FROM users LOOP
+    INSERT INTO user_permissions (user_id, page_id, status)
+    VALUES (f_user_id, NEW.page_id, true);
+  END LOOP;
+
+  RETURN NEW;
+END;
+$add_page_to_user_trg$ LANGUAGE plpgsql;
+
+
 insert into language_code (created_at, updated_at, language_code, english_name, arabic_name)
 values
 (

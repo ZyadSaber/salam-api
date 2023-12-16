@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import { newAndEditLabels, DeleteLabel } from '../types';
 
@@ -6,14 +7,30 @@ import { newAndEditLabels, DeleteLabel } from '../types';
 export class LabelsPageService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getLabelMainTable() {
-    const labelData = await this.prisma.language_code.findMany();
-    labelData.forEach((record) => {
-      //@ts-ignore
-      record.query_status = 'q';
-      return;
+  async getLabelMainTable(param?: {arabic_name?: string, english_name?: string}) {
+    const {english_name, arabic_name} = param
+    const labelData = await this.prisma.language_code.findMany({
+      where:{
+        english_name: {
+          contains:  english_name || undefined
+        },
+        arabic_name:{
+          contains:  arabic_name || undefined
+        }
+      }
     });
-    return { data: labelData };
+    const computedArray = labelData.map((record) => {
+      const obj = {
+        ...record,
+        updated_at: format(record.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        created_at: format(record.created_at, 'yyyy-MM-dd hh:mm aa'),
+        query_status: 'q',
+      };
+      return obj;
+    });
+    return {
+      data: computedArray,
+    };
   }
 
   async newLabel(dto:newAndEditLabels) {

@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { format } from 'date-fns';
 import { PrismaModuleService } from '../prisma-module/prisma-module.service';
 import { newPageName, editPageName, deletePageName } from '../types';
 
@@ -6,8 +7,36 @@ import { newPageName, editPageName, deletePageName } from '../types';
 export class PageNameService {
   constructor(private prisma: PrismaModuleService) {}
 
-  async getPageNameMainTable() {
+  async getPageNameMainTable(params: {
+    page_name?: string;
+    page_link?: string;
+    page_parent_id?: string;
+    page_disabled?: string;
+    run_in_modal?: string;
+  }) {
+    const {
+      page_name,
+      page_link,
+      page_parent_id,
+      page_disabled,
+      run_in_modal,
+    } = params;
     const pageNames = await this.prisma.app_pages.findMany({
+      where: {
+        page_name: {
+          contains: page_name || undefined
+        },
+        page_link: {
+          contains: page_link || undefined
+        },
+        page_disabled: {
+          contains: page_disabled || undefined
+        },
+        run_in_modal: {
+          contains: run_in_modal || undefined
+        },
+        page_parent_id: +page_parent_id || undefined
+      },
       orderBy: {
         page_id: 'asc',
       },
@@ -19,17 +48,20 @@ export class PageNameService {
         },
       },
     });
-    pageNames.map((pageName) => {
-      //@ts-ignore
-      pageName.query_status = 'q';
-      //@ts-ignore
-      pageName.page_parent_name = pageName.page_parent
-        ? pageName.page_parent.page_parent_name
-        : '';
-      delete pageName.page_parent;
+    const computedArray = pageNames.map((record) => {
+      const obj = {
+        ...record,
+        updated_at: format(record.updated_at, 'yyyy-MM-dd hh:mm aa'),
+        created_at: format(record.created_at, 'yyyy-MM-dd hh:mm aa'),
+        page_parent_name: record.page_parent
+          ? record.page_parent.page_parent_name
+          : '',
+        query_status: 'q',
+      };
+      return obj;
     });
     return {
-      data: pageNames,
+      data: computedArray,
     };
   }
 
@@ -55,28 +87,6 @@ export class PageNameService {
             page_parent_id: dto.page_parent_id,
           },
         });
-        // await this.prisma.$queryRaw`
-        //   do
-        //   $$
-        //   declare
-        //   f record;
-        //   begin
-        //   for f in select id
-        //     from users
-        //   loop
-        //   INSERT INTO user_permissions (
-        // 	  user_id,
-        //     page_id,
-        //     status
-        //   )VALUES(
-        //     f.id,
-        //     ${newPageName.page_id},
-        //     false
-        //   );
-        // end loop;
-        // end;
-        // $$;
-        // `;
         return {
           response: 'success',
           message: `Created Page Name ${newPageName.page_name}`,

@@ -18,8 +18,17 @@ export class PageNameController {
   constructor(private PageNameService: PageNameService) {}
 
   @Get('page_name_table_data')
-  getPageName() {
-    return this.PageNameService.getPageNameMainTable();
+  getPageName(
+    @Query()
+    params: {
+      page_name?: string;
+      page_link?: string;
+      page_parent_id?: string;
+      page_disabled?: string;
+      run_in_modal?: string;
+    },
+  ) {
+    return this.PageNameService.getPageNameMainTable(params);
   }
 
   @Get('page_name_list_to_view')
